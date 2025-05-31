@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import WelcomeScreen from '../components/WelcomeScreen';
 import MissionBriefing from '../components/MissionBriefing';
@@ -30,13 +31,16 @@ const Index = () => {
 
   const { sessionId, isLoading, saveProgress, loadProgress } = useGameProgress();
 
-  // Load saved progress on component mount
+  // Load saved progress on component mount (only once)
   useEffect(() => {
     const initializeProgress = async () => {
-      if (isLoading) return;
+      if (isLoading || progressLoaded) return;
 
+      console.log('Initializing progress...');
       const savedProgress = await loadProgress();
+      
       if (savedProgress) {
+        console.log('Restoring saved progress:', savedProgress);
         setCurrentCheckpoint(savedProgress.current_checkpoint);
         setLifelinesRemaining(savedProgress.lifelines_remaining);
         setEnteredCodes(savedProgress.completed_checkpoints);
@@ -49,31 +53,43 @@ const Index = () => {
         } else {
           setCurrentPhase('welcome');
         }
+      } else {
+        console.log('No saved progress found, starting fresh');
+        setCurrentPhase('welcome');
       }
+      
       setProgressLoaded(true);
     };
 
     initializeProgress();
-  }, [isLoading, loadProgress]);
+  }, [isLoading, loadProgress, progressLoaded]);
 
-  // Save progress whenever important state changes
+  // Monitor phase changes for debugging
   useEffect(() => {
-    if (progressLoaded && sessionId) {
-      saveProgress(currentCheckpoint, lifelinesRemaining, enteredCodes);
-    }
-  }, [currentCheckpoint, lifelinesRemaining, enteredCodes, progressLoaded, sessionId, saveProgress]);
+    console.log('Current phase changed to:', currentPhase);
+  }, [currentPhase]);
 
   const handleBeginMission = () => {
+    console.log('BEGIN MISSION clicked - current phase:', currentPhase);
+    console.log('Setting phase to briefing...');
     setCurrentPhase('briefing');
+    
+    // Save initial progress
+    if (sessionId && progressLoaded) {
+      saveProgress(0, 3, []);
+    }
   };
 
   const handleStartClues = () => {
+    console.log('START CLUES clicked - setting phase to clue');
     setCurrentPhase('clue');
   };
 
   const handleCodeSubmit = (code: string) => {
     const trimmedCode = code.trim().toUpperCase();
     const correctCode = correctCodes[currentCheckpoint].toUpperCase();
+    
+    console.log('Code submitted:', trimmedCode, 'Expected:', correctCode);
     
     if (trimmedCode === correctCode) {
       // Correct code
@@ -90,12 +106,24 @@ const Index = () => {
           // Show checkpoint 7 handler before checkpoint 7 (index 6)
           if (nextCheckpoint === 6) {
             setShowCheckpoint7Handler(true);
+            // Save progress before showing handler
+            if (sessionId && progressLoaded) {
+              saveProgress(nextCheckpoint, lifelinesRemaining, newEnteredCodes);
+            }
           } else {
             setCurrentCheckpoint(nextCheckpoint);
+            // Save progress
+            if (sessionId && progressLoaded) {
+              saveProgress(nextCheckpoint, lifelinesRemaining, newEnteredCodes);
+            }
           }
         } else {
           // Mission complete
           setCurrentPhase('final');
+          // Save final progress
+          if (sessionId && progressLoaded) {
+            saveProgress(correctCodes.length, lifelinesRemaining, newEnteredCodes);
+          }
         }
       }, 2000);
     } else {
@@ -108,13 +136,21 @@ const Index = () => {
 
   const handleUseLifeline = () => {
     if (lifelinesRemaining > 0) {
-      setLifelinesRemaining(lifelinesRemaining - 1);
+      const newLifelines = lifelinesRemaining - 1;
+      setLifelinesRemaining(newLifelines);
+      
+      // Save updated lifelines
+      if (sessionId && progressLoaded) {
+        saveProgress(currentCheckpoint, newLifelines, enteredCodes);
+      }
+      
       return true; // Indicate lifeline was used
     }
     return false;
   };
 
   const handleCheckpoint7Continue = () => {
+    console.log('Checkpoint 7 handler - continuing to clue');
     setShowCheckpoint7Handler(false);
     setCurrentCheckpoint(6); // Checkpoint 7 (index 6)
   };

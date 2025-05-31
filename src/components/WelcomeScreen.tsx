@@ -9,6 +9,13 @@ interface WelcomeScreenProps {
 const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onBeginMission }) => {
   const audioUrl = "https://epukqhdfdoxvowyflral.supabase.co/storage/v1/object/public/audio-files/welcome-transmission.mp3";
 
+  const handleBeginClick = (event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    console.log('Welcome screen - BEGIN MISSION button clicked');
+    onBeginMission();
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="max-w-md w-full text-center space-y-8">
@@ -36,7 +43,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onBeginMission }) => {
           </div>
           
           <button
-            onClick={onBeginMission}
+            onClick={handleBeginClick}
             className="mt-8 w-full bg-green-600 hover:bg-green-500 text-black font-bold py-3 px-6 transition-colors duration-200 border border-green-400"
           >
             [BEGIN MISSION]

@@ -23,6 +23,7 @@ export const useGameProgress = () => {
         localStorage.setItem('treasure_hunt_session', storedSessionId);
       }
       
+      console.log('Session ID initialized:', storedSessionId);
       setSessionId(storedSessionId);
       setIsLoading(false);
     };
@@ -30,15 +31,20 @@ export const useGameProgress = () => {
     getOrCreateSessionId();
   }, []);
 
-  // Save progress to Supabase
+  // Save progress to Supabase with proper UPSERT
   const saveProgress = async (
     currentCheckpoint: number, 
     lifelinesRemaining: number, 
     completedCheckpoints: string[] = []
   ) => {
-    if (!sessionId) return;
+    if (!sessionId) {
+      console.log('No session ID available for saving progress');
+      return;
+    }
 
     try {
+      console.log('Saving progress:', { currentCheckpoint, lifelinesRemaining, completedCheckpoints });
+      
       const { error } = await supabase
         .from('game_progress')
         .upsert({
@@ -47,6 +53,8 @@ export const useGameProgress = () => {
           lifelines_remaining: lifelinesRemaining,
           completed_checkpoints: completedCheckpoints,
           updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'session_id'
         });
 
       if (error) {
@@ -61,9 +69,14 @@ export const useGameProgress = () => {
 
   // Load progress from Supabase
   const loadProgress = async (): Promise<GameProgress | null> => {
-    if (!sessionId) return null;
+    if (!sessionId) {
+      console.log('No session ID available for loading progress');
+      return null;
+    }
 
     try {
+      console.log('Loading progress for session:', sessionId);
+      
       const { data, error } = await supabase
         .from('game_progress')
         .select('*')
@@ -75,6 +88,7 @@ export const useGameProgress = () => {
         return null;
       }
 
+      console.log('Progress loaded:', data);
       return data;
     } catch (error) {
       console.error('Error loading progress:', error);
