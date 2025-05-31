@@ -1,68 +1,101 @@
 
 export const getClueText = (checkpoint: number): string => {
   const clues = [
-    // Checkpoint 1 - BACKPACK
+    // Checkpoint 1 - HANDBAG
     `I'm zipped, I'm clipped, I'm slung with pride,
 Your daily sidekick, stuff inside.
 To start your quest, don't look too far—
 Your answer's where your essentials are.`,
 
     // Checkpoint 2 - CLASSROOM
-    `Agent, your next destination awaits.
-Head to Torrington Place, where knowledge creates.
-Look for the room where lessons are taught,
-The code you seek is what learning has brought.`,
+    `Near the hum of trains and city's flow,
+A chilly breeze from vents that blow.
+Screens appear at a gentle command,
+Down the stairs, deep in recess.
+Find your clue where work feels right— A hidden secret out of sight.`,
 
-    // Checkpoint 3 - WATERSTONES
-    `Between the pages of stories untold,
-Where books are traded, bought and sold.
-A chain of knowledge, words to explore,
-Find your next clue in this literary store.`,
+    // Checkpoint 3 - BOOKMARK
+    `Image clue - blurred Waterstones image`,
 
-    // Checkpoint 4 - LIBRARY
-    `Where silence reigns and knowledge flows,
-Where students study and wisdom grows.
-Science and learning, floor by floor,
-Your next code waits behind knowledge's door.`,
+    // Checkpoint 4 - LABCOAT
+    `Agent, your next clue isn't hidden in a book or behind a monitor—it's somewhere only the truly tech-savvy can find.
 
-    // Checkpoint 5 - MEDAWAR
-    `Named for a Nobel Prize winner true,
-This building houses research too.
-Where experiments and theories blend,
-Your mission's path will here extend.`,
+In Malet's maze where quiet thrives,
+We've sat together, shared plenty of vibes.
+Screens glow softly, rows on rows,
+Floors above and floors below.
+To unlock your next secret's gate,
+Log in now—don't hesitate.
+On any PC, open this site,
+The bigger screen reveals your light.
 
-    // Checkpoint 6 - CAFE
-    `When energy runs low and spirits need lift,
-This place provides caffeinated gift.
-Where printing meets refreshment's call,
-Your next clue waits within these walls.`,
+On desktop, display a sidebar or a small, semi-transparent overlay with the next code/clue that is not visible in mobile view (use CSS media queries to hide/show).`,
 
-    // Checkpoint 7 - CROATIA
-    `A planning room with foreign name,
-Where future courses stake their claim.
-In IOE where teachers train,
-This coded word will break the chain.`,
+    // Checkpoint 5 - ATTENDANCE
+    `On Mondays at noon, a lecture you'd miss,
+While I'd tap your card—attendance bliss.
+We watched Eega, the fly's revenge in sight,
+But left before the end of night.
+Find the hall where cards unlock,
+Your next clue waits—just take stock.`,
 
-    // Checkpoint 8 - STAIRS
-    `Agent, it's Aven again.
+    // Checkpoint 6 - ESPRESSO
+    `Where pages once turned and printers roared,
+Now quiet sips replace what's poured.
+You're on a coffee ban, but memories stay—
+Go up to the counter or a waiter,
+Say, 'I left something here—a small envelope.'
+Don't worry—they don't know about the mission,
+Just ask confidently, and you'll get what you came for!`,
 
-Honestly, I'm shocked you've made it this far. I had a bet going in HQ that you'd get distracted by irrelevant details by now, but here you are—one step from the finish line.
+    // Checkpoint 7 - PHOTOSHOOT
+    `On sunny steps where light would play,
+You snapped my red dress in perfect sway.
+A friend nearby, the scene was bright,
+Posing there felt just right.
+Find the stairs where memories gleam—
+Your next clue waits beside the beam.`,
 
-This is your last checkpoint before the grand finale. Stay sharp, Agent. The diploma is almost within reach. It's best not to think about whether the clues even relate to your diploma at this stage. But hey, trust me—it'll all be worth it in the end.
-
-Now, let's see if you can pull off the impossible one more time.
-
-Up and down, step by step you go,
-In IOE where knowledge can flow.
-Your path ascends to reach your goal,
-These steps will make your mission whole.`,
-
-    // Checkpoint 9 - ALLNIGHT
-    `The final stretch, your journey's end,
-Where students gather, study, and blend.
-When deadlines loom and time runs late,
-This centre opens, seals your fate.`
+    // Checkpoint 8 - ALLNIGHT
+    `At the peak of study, high above the ground,
+A room exists where comfort's found.
+Comfy armchairs just outside its door,
+Where three friends stayed when night was in store.
+Parents abroad, a late-night stay,
+Too dark to wander home that day.
+A 24/7 place where all blend—
+Your final clue waits at the very end.`
   ];
 
   return clues[checkpoint] || "No clue available.";
+};
+
+export const getLifelineText = (checkpoint: number): string => {
+  const lifelines = [
+    // Checkpoint 1 - HANDBAG
+    "The password is HANDBAG. Obviously, you fool. Now, you wasted a lifeline.",
+
+    // Checkpoint 2 - CLASSROOM
+    "The password is CLASSROOM. 1-19 Torrington Place, duh.",
+
+    // Checkpoint 3 - BOOKMARK
+    "The password is BOOKMARK. It's Waterstones, where you took your profile picture!",
+
+    // Checkpoint 4 - LABCOAT
+    "The password is LABCOAT. It's like I have to tell you everything. It was Science Library!!!",
+
+    // Checkpoint 5 - ATTENDANCE
+    "The password is ATTENDANCE, which is something you had a very low % of at your lectures in Medawar Building.",
+
+    // Checkpoint 6 - ESPRESSO
+    "The password is ESPRESSO. Were you too socially anxious to say anything in Print Room Cafe?",
+
+    // Checkpoint 7 - PHOTOSHOOT
+    "The password is PHOTOSHOOT. Remember?! That sunny day at the IOE stairs?!!!!",
+
+    // Checkpoint 8 - ALLNIGHT
+    "The password is ALLNIGHT. Have you genuinely blocked out that eventful night at the Student Centre in Group Study Room 4.04?"
+  ];
+
+  return lifelines[checkpoint] || "No lifeline available.";
 };

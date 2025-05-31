@@ -6,15 +6,14 @@ import ClueInterface from '../components/ClueInterface';
 import { GamePhase } from '../types/game';
 
 const correctCodes = [
-  "BACKPACK", // Checkpoint 1 - bag riddle
-  "CLASSROOM", // Checkpoint 2 - Torrington Place  
-  "WATERSTONES", // Checkpoint 3 - bookstore
-  "LIBRARY", // Checkpoint 4 - Science Library
-  "MEDAWAR", // Checkpoint 5 - Medawar Building
-  "CAFE", // Checkpoint 6 - Print Room Cafe
-  "CROATIA", // Checkpoint 7 - IOE planning room
-  "STAIRS", // Checkpoint 8 - IOE stairs
-  "ALLNIGHT" // Checkpoint 9 - Student centre final
+  "HANDBAG",     // Checkpoint 1
+  "CLASSROOM",   // Checkpoint 2  
+  "BOOKMARK",    // Checkpoint 3
+  "LABCOAT",     // Checkpoint 4
+  "ATTENDANCE",  // Checkpoint 5
+  "ESPRESSO",    // Checkpoint 6
+  "PHOTOSHOOT",  // Checkpoint 7 (was 8)
+  "ALLNIGHT"     // Checkpoint 8 (was 9, final)
 ];
 
 const Index = () => {
@@ -35,7 +34,7 @@ const Index = () => {
 
   const handleCodeSubmit = (code: string) => {
     const trimmedCode = code.trim().toUpperCase();
-    const correctCode = correctCodes[currentCheckpoint];
+    const correctCode = correctCodes[currentCheckpoint].toUpperCase();
     
     if (trimmedCode === correctCode) {
       // Correct code
@@ -63,9 +62,9 @@ const Index = () => {
   const handleUseLifeline = () => {
     if (lifelinesRemaining > 0) {
       setLifelinesRemaining(lifelinesRemaining - 1);
-      // For now, just show an alert - can be enhanced with actual hints
-      alert('Lifeline used! Hint functionality coming soon...');
+      return true; // Indicate lifeline was used
     }
+    return false;
   };
 
   return (
@@ -97,15 +96,18 @@ const Index = () => {
 
       {currentPhase === 'final' && (
         <div className="min-h-screen flex items-center justify-center p-4">
-          <div className="text-center space-y-6">
-            <div className="text-2xl font-bold text-green-300 mb-8">
-              MISSION ACCOMPLISHED
-            </div>
-            <div className="text-lg">
-              Congratulations, Agent Aishu!
-            </div>
-            <div className="text-sm opacity-80">
-              Your diploma awaits...
+          <div className="max-w-md w-full space-y-6">
+            <div className="border border-green-400 p-6 bg-black/90">
+              <div className="text-lg font-bold mb-4 text-green-300">
+                MISSION ACCOMPLISHED
+              </div>
+              <div className="text-xs leading-relaxed whitespace-pre-line">
+                {`You actually made it? Didn't think you'd crack the code, Agent—but here you are, standing at the final checkpoint, top floor, secret lair of questionable armchairs and even more questionable life choices.
+
+Don't get too comfortable—HQ says you're not technically cleared to graduate until the grades are in (bureaucracy, am I right?) But your next assignment begins now: we'll be watching RRR. Consider it vital research for your ongoing secret agent mission. Debrief snacks will be provided.
+
+But for now, come outside the room, please.`}
+              </div>
             </div>
           </div>
         </div>

@@ -19,7 +19,7 @@ const MissionBriefing: React.FC<MissionBriefingProps> = ({ onStartClues }) => {
             
             <p>Your mission is to recover top-secret intel related to your stolen diploma. These have been cunningly stashed across campus by our most devious operatives (and possibly by San, in a fit of mischief).</p>
             
-            <p>There are 9 secret checkpoints scattered around UCL campus. At each checkpoint, your mission is to find a secret code hidden inside a discreet envelope. Once you've got the code, enter it here to unlock your next clue and keep the mission moving.</p>
+            <p>There are 8 secret checkpoints scattered around UCL campus. At each checkpoint, your mission is to find a secret code hidden inside a discreet envelope. Once you've got the code, enter it here to unlock your next clue and keep the mission moving.</p>
             
             <p>Make it all the way to the final location and you'll unlock a classified "briefing"—and, just maybe, the safe return of your precious graduation diploma… but only after you complete one last top-secret assignment.</p>
             

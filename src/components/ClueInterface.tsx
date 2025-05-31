@@ -1,12 +1,12 @@
 
 import React, { useState } from 'react';
-import { getClueText } from '../utils/clueData';
+import { getClueText, getLifelineText } from '../utils/clueData';
 
 interface ClueInterfaceProps {
   currentCheckpoint: number;
   lifelinesRemaining: number;
   onCodeSubmit: (code: string) => void;
-  onUseLifeline: () => void;
+  onUseLifeline: () => boolean;
   showError: boolean;
   showSuccess: boolean;
   totalCheckpoints: number;
@@ -22,12 +22,24 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
   totalCheckpoints
 }) => {
   const [inputCode, setInputCode] = useState('');
+  const [showLifeline, setShowLifeline] = useState(false);
+  const [lifelineText, setLifelineText] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (inputCode.trim()) {
       onCodeSubmit(inputCode);
       setInputCode('');
+    }
+  };
+
+  const handleLifelineClick = () => {
+    const wasUsed = onUseLifeline();
+    if (wasUsed) {
+      const lifeline = getLifelineText(currentCheckpoint);
+      setLifelineText(lifeline);
+      setShowLifeline(true);
+      setTimeout(() => setShowLifeline(false), 5000);
     }
   };
 
@@ -85,16 +97,28 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
 
         {/* Lifeline Button */}
         <button
-          onClick={onUseLifeline}
+          onClick={handleLifelineClick}
           className={`w-full py-2 px-4 border text-sm transition-colors duration-200 ${
-            lifelinesRemaining > 0 && currentCheckpoint > 0
+            lifelinesRemaining > 0
               ? 'border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black'
               : 'border-gray-600 text-gray-600 cursor-not-allowed'
           }`}
-          disabled={lifelinesRemaining === 0 || currentCheckpoint === 0}
+          disabled={lifelinesRemaining === 0}
         >
           {lifelinesRemaining > 0 ? '[REQUEST LIFELINE]' : '[NO LIFELINES REMAINING]'}
         </button>
+
+        {/* Lifeline Display */}
+        {showLifeline && (
+          <div className="border border-yellow-400 bg-yellow-900/20 p-4">
+            <div className="text-yellow-300 text-sm font-bold mb-2 text-center">
+              LIFELINE ACTIVATED
+            </div>
+            <div className="text-yellow-200 text-xs leading-relaxed">
+              {lifelineText}
+            </div>
+          </div>
+        )}
 
         {/* Status Messages */}
         {showError && (
