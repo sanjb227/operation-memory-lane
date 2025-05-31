@@ -24,21 +24,14 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onBeginMission }) => {
             CLASSIFIED TRANSMISSION
           </div>
           
-          <div className="text-left space-y-4 text-sm leading-relaxed">
+          <div className="text-left space-y-4 text-sm leading-relaxed mb-6">
             <p>Welcome, Agent Aishu.</p>
-            
-            <p>We have a situation. Someone's stolen your graduation diploma, and without it, you're officially stuck in university limbo. The only way to get it back? Complete this mission.</p>
-            
-            <p>No pressure, but… graduation depends on you.</p>
-            
-            <p>Get ready. Operation Memory Lane is in progress.</p>
           </div>
           
           <div className="mt-6">
             <AudioPlayer
               src={audioUrl}
               label="CLASSIFIED TRANSMISSION"
-              autoPlay={true}
             />
           </div>
           

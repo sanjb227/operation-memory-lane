@@ -4,7 +4,6 @@ import React, { useState, useRef, useEffect } from 'react';
 interface AudioPlayerProps {
   src: string;
   label: string;
-  autoPlay?: boolean;
   onPlay?: () => void;
   onEnded?: () => void;
 }
@@ -12,7 +11,6 @@ interface AudioPlayerProps {
 const AudioPlayer: React.FC<AudioPlayerProps> = ({ 
   src, 
   label, 
-  autoPlay = false, 
   onPlay, 
   onEnded 
 }) => {
@@ -68,20 +66,6 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
     };
   }, [onPlay, onEnded, hasPlayed]);
 
-  useEffect(() => {
-    if (autoPlay && audioRef.current) {
-      // Auto-play with user interaction required
-      const playAudio = async () => {
-        try {
-          await audioRef.current?.play();
-        } catch (error) {
-          console.log('Auto-play prevented, user interaction required');
-        }
-      };
-      playAudio();
-    }
-  }, [autoPlay]);
-
   const handlePlayPause = async () => {
     if (!audioRef.current) return;
 
@@ -124,13 +108,19 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
 
   const progressPercentage = duration > 0 ? (currentTime / duration) * 100 : 0;
 
+  // Add timestamp for cache busting
+  const getAudioUrl = (url: string) => {
+    const timestamp = Date.now();
+    return `${url}?t=${timestamp}`;
+  };
+
   return (
     <div className="border border-green-400 bg-black/90 p-4 space-y-3">
       <div className="text-green-300 font-bold text-xs text-center">
         {label}
       </div>
       
-      <audio ref={audioRef} src={src} preload="metadata" />
+      <audio ref={audioRef} src={getAudioUrl(src)} preload="metadata" />
       
       {/* Progress Bar */}
       <div className="w-full bg-green-900/30 border border-green-600 h-1">

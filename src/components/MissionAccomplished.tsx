@@ -1,9 +1,19 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import AudioPlayer from './AudioPlayer';
 
 const MissionAccomplished: React.FC = () => {
+  const [hasStartedAudio, setHasStartedAudio] = useState(false);
   const audioUrl = "https://epukqhdfdoxvowyflral.supabase.co/storage/v1/object/public/audio-files/mission-accomplished.mp3";
+
+  const handleAudioPlay = () => {
+    setHasStartedAudio(true);
+  };
+
+  const handleCompleteClick = () => {
+    console.log('Mission completed - all objectives achieved');
+    // Could add additional completion logic here if needed
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
@@ -13,19 +23,27 @@ const MissionAccomplished: React.FC = () => {
             MISSION ACCOMPLISHED
           </div>
           
-          <div className="text-xs leading-relaxed whitespace-pre-line mb-6">
-            {`You actually made it? Didn't think you'd crack the code, Agent—but here you are, standing at the final checkpoint, top floor, secret lair of questionable armchairs and even more questionable life choices.
-
-Don't get too comfortable—HQ says you're not technically cleared to graduate until the grades are in (bureaucracy, am I right?) But your next assignment begins now: we'll be watching RRR. Consider it vital research for your ongoing secret agent mission. Debrief snacks will be provided.
-
-But for now, come outside the room, please.`}
+          <div className="text-xs leading-relaxed mb-6">
+            Transmission from HQ...
           </div>
 
           <AudioPlayer
             src={audioUrl}
             label="MISSION ACCOMPLISHED"
-            autoPlay={true}
+            onPlay={handleAudioPlay}
           />
+
+          <button
+            onClick={handleCompleteClick}
+            disabled={!hasStartedAudio}
+            className={`mt-6 w-full font-bold py-3 px-4 transition-colors duration-200 border ${
+              hasStartedAudio
+                ? 'bg-green-600 hover:bg-green-500 text-black border-green-400'
+                : 'border-gray-600 text-gray-600 cursor-not-allowed'
+            }`}
+          >
+            [COMPLETE MISSION]
+          </button>
         </div>
       </div>
     </div>
