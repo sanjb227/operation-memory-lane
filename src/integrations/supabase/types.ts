@@ -9,7 +9,36 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      game_progress: {
+        Row: {
+          completed_checkpoints: string[] | null
+          created_at: string | null
+          current_checkpoint: number | null
+          id: string
+          lifelines_remaining: number | null
+          session_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          completed_checkpoints?: string[] | null
+          created_at?: string | null
+          current_checkpoint?: number | null
+          id?: string
+          lifelines_remaining?: number | null
+          session_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          completed_checkpoints?: string[] | null
+          created_at?: string | null
+          current_checkpoint?: number | null
+          id?: string
+          lifelines_remaining?: number | null
+          session_id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

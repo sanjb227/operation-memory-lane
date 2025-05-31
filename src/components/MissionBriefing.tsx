@@ -1,11 +1,14 @@
 
 import React from 'react';
+import AudioPlayer from './AudioPlayer';
 
 interface MissionBriefingProps {
   onStartClues: () => void;
 }
 
 const MissionBriefing: React.FC<MissionBriefingProps> = ({ onStartClues }) => {
+  const audioUrl = "https://epukqhdfdoxvowyflral.supabase.co/storage/v1/object/public/audio-files/mission-briefing-aven.mp3";
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="max-w-md w-full space-y-6">
@@ -28,6 +31,13 @@ const MissionBriefing: React.FC<MissionBriefingProps> = ({ onStartClues }) => {
             <p>Lucky you—your first clue comes with no password required. Consider it a freebie from HQ (don't get used to it).</p>
             
             <p>Good luck. This message will self-destruct in… just kidding.</p>
+          </div>
+
+          <div className="mt-6">
+            <AudioPlayer
+              src={audioUrl}
+              label="MISSION BRIEFING - HANDLER AVEN"
+            />
           </div>
           
           <button

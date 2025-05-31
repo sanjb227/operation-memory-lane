@@ -1,11 +1,14 @@
 
 import React from 'react';
+import AudioPlayer from './AudioPlayer';
 
 interface WelcomeScreenProps {
   onBeginMission: () => void;
 }
 
 const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onBeginMission }) => {
+  const audioUrl = "https://epukqhdfdoxvowyflral.supabase.co/storage/v1/object/public/audio-files/welcome-transmission.mp3";
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="max-w-md w-full text-center space-y-8">
@@ -22,6 +25,14 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onBeginMission }) => {
             <p>No pressure, but… graduation depends on you.</p>
             
             <p>Get ready. Operation Memory Lane is in progress.</p>
+          </div>
+          
+          <div className="mt-6">
+            <AudioPlayer
+              src={audioUrl}
+              label="CLASSIFIED TRANSMISSION"
+              autoPlay={true}
+            />
           </div>
           
           <button
