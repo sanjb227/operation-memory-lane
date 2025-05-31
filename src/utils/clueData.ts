@@ -1,4 +1,3 @@
-
 export const getClueText = (checkpoint: number): string => {
   const clues = [
     // Checkpoint 1 - HANDBAG
@@ -27,9 +26,7 @@ Floors above and floors below.
 To unlock your next secret's gate,
 Log in now—don't hesitate.
 On any PC, open this site,
-The bigger screen reveals your light.
-
-On desktop, display a sidebar or a small, semi-transparent overlay with the next code/clue that is not visible in mobile view (use CSS media queries to hide/show).`,
+The bigger screen reveals your light.`,
 
     // Checkpoint 5 - ATTENDANCE
     `On Mondays at noon, a lecture you'd miss,

@@ -22,14 +22,18 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
   totalCheckpoints
 }) => {
   const [inputCode, setInputCode] = useState('');
-  const [showLifeline, setShowLifeline] = useState(false);
   const [lifelineText, setLifelineText] = useState('');
+  const [showLifeline, setShowLifeline] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (inputCode.trim()) {
       onCodeSubmit(inputCode);
       setInputCode('');
+      // Clear lifeline text when moving to next checkpoint
+      setShowLifeline(false);
+      setLifelineText('');
     }
   };
 
@@ -39,7 +43,7 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
       const lifeline = getLifelineText(currentCheckpoint);
       setLifelineText(lifeline);
       setShowLifeline(true);
-      setTimeout(() => setShowLifeline(false), 5000);
+      // No timer - lifeline text stays visible permanently
     }
   };
 
@@ -49,6 +53,50 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="max-w-md w-full space-y-6">
+        {/* Help Button */}
+        <div className="absolute top-4 left-4">
+          <button
+            onClick={() => setShowHelp(!showHelp)}
+            className="text-green-400 border border-green-400 px-2 py-1 text-xs hover:bg-green-400 hover:text-black transition-colors"
+          >
+            HELP
+          </button>
+        </div>
+
+        {/* Desktop Hint for Checkpoint 4 Only */}
+        {currentCheckpoint === 3 && (
+          <div className="desktop-hint">
+            <div className="text-xs font-bold mb-1">DESKTOP ACCESS GRANTED</div>
+            <div className="text-xs">PASSWORD: LABCOAT</div>
+          </div>
+        )}
+
+        {/* Help Popup */}
+        {showHelp && (
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+            <div className="bg-black border border-green-400 p-6 max-w-sm w-full">
+              <div className="text-green-300 font-bold mb-4 text-center">
+                HELP - MISSION INTEL
+              </div>
+              <div className="text-xs leading-relaxed text-green-400 space-y-2">
+                <p>Seriously? You Need Help Already, Agent?</p>
+                <p>You'll receive a clue at each step—the first clue is given to you directly.</p>
+                <p>Each clue is based on an inside joke or shared memory.</p>
+                <p>Most clues are hidden in a small envelope at the location (unless the clue is digital).</p>
+                <p>Inside the envelope, you'll find a password.</p>
+                <p>Enter the password on the site to unlock your next clue and discover your next location.</p>
+                <p>Repeat this process until you reach the final destination, where you'll find one last envelope and enter its password to complete the game and 'graduate.'</p>
+              </div>
+              <button
+                onClick={() => setShowHelp(false)}
+                className="mt-4 w-full bg-green-600 hover:bg-green-500 text-black font-bold py-2 px-4 transition-colors"
+              >
+                [CLOSE]
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Progress Indicator */}
         <div className="text-center text-green-300">
           <div className="text-sm font-bold">
@@ -108,8 +156,8 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
           {lifelinesRemaining > 0 ? '[REQUEST LIFELINE]' : '[NO LIFELINES REMAINING]'}
         </button>
 
-        {/* Lifeline Display */}
-        {showLifeline && (
+        {/* Persistent Lifeline Display */}
+        {showLifeline && lifelineText && (
           <div className="border border-yellow-400 bg-yellow-900/20 p-4">
             <div className="text-yellow-300 text-sm font-bold mb-2 text-center">
               LIFELINE ACTIVATED
