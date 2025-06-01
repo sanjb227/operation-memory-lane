@@ -21,22 +21,47 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
   const [currentTime, setCurrentTime] = useState(0);
   const [hasPlayed, setHasPlayed] = useState(false);
   const [canPlay, setCanPlay] = useState(false);
+  const [loadingTimeout, setLoadingTimeout] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
 
+    // CRITICAL: Set timeout to enable controls after 8 seconds regardless of load state
+    timeoutRef.current = setTimeout(() => {
+      console.warn('Audio loading timeout - enabling controls manually');
+      setIsLoading(false);
+      setCanPlay(true);
+      setLoadingTimeout(true);
+    }, 8000);
+
     const handleLoadedMetadata = () => {
       console.log('Audio metadata loaded');
       setDuration(audio.duration);
-      setIsLoading(false);
     };
 
     const handleCanPlayThrough = () => {
       console.log('Audio can play through');
       setCanPlay(true);
       setIsLoading(false);
+      // Clear timeout since audio loaded successfully
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    };
+
+    const handleCanPlay = () => {
+      console.log('Audio can play (basic)');
+      setCanPlay(true);
+      setIsLoading(false);
+      // Clear timeout since audio loaded successfully
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
     };
 
     const handleTimeUpdate = () => {
@@ -66,8 +91,14 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
 
     const handleError = (e: Event) => {
       console.error('Audio error:', e);
+      // CRITICAL: Don't let errors permanently disable controls
       setIsLoading(false);
-      setCanPlay(false);
+      setCanPlay(true); // Enable controls even on error
+      setLoadingTimeout(true);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
     };
 
     const handleLoadStart = () => {
@@ -79,6 +110,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
     // Add all event listeners
     audio.addEventListener('loadedmetadata', handleLoadedMetadata);
     audio.addEventListener('canplaythrough', handleCanPlayThrough);
+    audio.addEventListener('canplay', handleCanPlay); // Additional fallback
     audio.addEventListener('timeupdate', handleTimeUpdate);
     audio.addEventListener('ended', handleEnded);
     audio.addEventListener('play', handlePlay);
@@ -90,8 +122,14 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
     audio.load();
 
     return () => {
+      // Clear timeout on cleanup
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
       audio.removeEventListener('canplaythrough', handleCanPlayThrough);
+      audio.removeEventListener('canplay', handleCanPlay);
       audio.removeEventListener('timeupdate', handleTimeUpdate);
       audio.removeEventListener('ended', handleEnded);
       audio.removeEventListener('play', handlePlay);
@@ -103,7 +141,13 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
 
   const handlePlayPause = async () => {
     const audio = audioRef.current;
-    if (!audio || !canPlay) {
+    if (!audio) {
+      console.log('Audio element not available');
+      return;
+    }
+
+    // CRITICAL: Allow play attempt even if canPlay is false (timeout fallback)
+    if (!canPlay && !loadingTimeout) {
       console.log('Audio not ready for playback');
       return;
     }
@@ -122,12 +166,20 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
       }
     } catch (error) {
       console.error('Audio playback error:', error);
+      // Even if play fails, update UI to show attempt was made
+      setIsPlaying(false);
     }
   };
 
   const handleReplay = async () => {
     const audio = audioRef.current;
-    if (!audio || !canPlay) {
+    if (!audio) {
+      console.log('Audio element not available for replay');
+      return;
+    }
+    
+    // CRITICAL: Allow replay attempt even if canPlay is false (timeout fallback)
+    if (!canPlay && !loadingTimeout) {
       console.log('Audio not ready for replay');
       return;
     }
@@ -139,6 +191,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
       await audio.play();
     } catch (error) {
       console.error('Audio replay error:', error);
+      setIsPlaying(false);
     }
   };
 
@@ -165,6 +218,9 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
     return `${url}?t=${timestamp}`;
   };
 
+  // CRITICAL: Determine if controls should be enabled
+  const controlsEnabled = canPlay || loadingTimeout;
+
   return (
     <div className="border border-green-400 bg-black/90 p-4 space-y-3">
       <div className="text-green-300 font-bold text-xs text-center">
@@ -179,9 +235,16 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
       />
       
       {/* Loading Indicator */}
-      {isLoading && (
+      {isLoading && !loadingTimeout && (
         <div className="text-green-400 text-xs text-center">
           Loading audio...
+        </div>
+      )}
+      
+      {/* Timeout Warning */}
+      {loadingTimeout && (
+        <div className="text-yellow-400 text-xs text-center">
+          Audio may be unavailable - controls enabled manually
         </div>
       )}
       
@@ -202,21 +265,21 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
       <div className="flex justify-center space-x-2">
         <button
           onClick={handlePlayPause}
-          disabled={isLoading || !canPlay}
+          disabled={!controlsEnabled}
           className={`font-bold py-1 px-3 text-xs transition-colors border ${
-            isLoading || !canPlay
+            !controlsEnabled
               ? 'border-gray-600 text-gray-600 cursor-not-allowed'
               : 'bg-green-600 hover:bg-green-500 text-black border-green-400'
           }`}
         >
-          {isLoading ? '[LOADING]' : isPlaying ? '[PAUSE]' : '[PLAY]'}
+          {!controlsEnabled ? '[LOADING]' : isPlaying ? '[PAUSE]' : '[PLAY]'}
         </button>
         
         <button
           onClick={handleReplay}
-          disabled={isLoading || !canPlay}
+          disabled={!controlsEnabled}
           className={`font-bold py-1 px-3 text-xs transition-colors border ${
-            isLoading || !canPlay
+            !controlsEnabled
               ? 'border-gray-600 text-gray-600 cursor-not-allowed'
               : 'border-green-400 text-green-400 hover:bg-green-400 hover:text-black'
           }`}
@@ -226,9 +289,9 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
         
         <button
           onClick={toggleSpeed}
-          disabled={isLoading || !canPlay}
+          disabled={!controlsEnabled}
           className={`font-bold py-1 px-3 text-xs transition-colors border ${
-            isLoading || !canPlay
+            !controlsEnabled
               ? 'border-gray-600 text-gray-600 cursor-not-allowed'
               : 'border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black'
           }`}
