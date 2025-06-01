@@ -122,3 +122,44 @@
     border-radius: 2px;
   }
 }
+
+/* EMERGENCY FIX - FORCE ENABLE ALL BUTTONS */
+button[disabled],
+.btn-disabled,
+button:disabled,
+[disabled] {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    background-color: #16a34a !important;
+    color: #000 !important;
+    border: 1px solid #22c55e !important;
+}
+
+/* Force enable audio control buttons specifically */
+.audio-control-btn,
+button[class*="border-gray"],
+button[class*="text-gray"] {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    background-color: #16a34a !important;
+    color: #000 !important;
+    border: 1px solid #22c55e !important;
+}
+
+/* Emergency skip button styling */
+.emergency-skip {
+    position: fixed !important;
+    top: 20px !important;
+    left: 20px !important;
+    background: #dc2626 !important;
+    color: white !important;
+    padding: 10px 20px !important;
+    border: none !important;
+    border-radius: 5px !important;
+    cursor: pointer !important;
+    z-index: 9999 !important;
+    font-size: 16px !important;
+    font-weight: bold !important;
+}
