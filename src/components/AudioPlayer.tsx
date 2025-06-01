@@ -15,10 +15,12 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
   onEnded 
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [playbackRate, setPlaybackRate] = useState(1);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [hasPlayed, setHasPlayed] = useState(false);
+  const [canPlay, setCanPlay] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
@@ -26,7 +28,15 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
     if (!audio) return;
 
     const handleLoadedMetadata = () => {
+      console.log('Audio metadata loaded');
       setDuration(audio.duration);
+      setIsLoading(false);
+    };
+
+    const handleCanPlayThrough = () => {
+      console.log('Audio can play through');
+      setCanPlay(true);
+      setIsLoading(false);
     };
 
     const handleTimeUpdate = () => {
@@ -34,12 +44,14 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
     };
 
     const handleEnded = () => {
+      console.log('Audio ended');
       setIsPlaying(false);
       setCurrentTime(0);
       onEnded?.();
     };
 
     const handlePlay = () => {
+      console.log('Audio started playing');
       setIsPlaying(true);
       if (!hasPlayed) {
         setHasPlayed(true);
@@ -48,32 +60,65 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
     };
 
     const handlePause = () => {
+      console.log('Audio paused');
       setIsPlaying(false);
     };
 
+    const handleError = (e: Event) => {
+      console.error('Audio error:', e);
+      setIsLoading(false);
+      setCanPlay(false);
+    };
+
+    const handleLoadStart = () => {
+      console.log('Audio load started');
+      setIsLoading(true);
+      setCanPlay(false);
+    };
+
+    // Add all event listeners
     audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+    audio.addEventListener('canplaythrough', handleCanPlayThrough);
     audio.addEventListener('timeupdate', handleTimeUpdate);
     audio.addEventListener('ended', handleEnded);
     audio.addEventListener('play', handlePlay);
     audio.addEventListener('pause', handlePause);
+    audio.addEventListener('error', handleError);
+    audio.addEventListener('loadstart', handleLoadStart);
+
+    // Force load the audio
+    audio.load();
 
     return () => {
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      audio.removeEventListener('canplaythrough', handleCanPlayThrough);
       audio.removeEventListener('timeupdate', handleTimeUpdate);
       audio.removeEventListener('ended', handleEnded);
       audio.removeEventListener('play', handlePlay);
       audio.removeEventListener('pause', handlePause);
+      audio.removeEventListener('error', handleError);
+      audio.removeEventListener('loadstart', handleLoadStart);
     };
-  }, [onPlay, onEnded, hasPlayed]);
+  }, [onPlay, onEnded, hasPlayed, src]);
 
   const handlePlayPause = async () => {
-    if (!audioRef.current) return;
+    const audio = audioRef.current;
+    if (!audio || !canPlay) {
+      console.log('Audio not ready for playback');
+      return;
+    }
 
     try {
       if (isPlaying) {
-        audioRef.current.pause();
+        console.log('Pausing audio');
+        audio.pause();
       } else {
-        await audioRef.current.play();
+        console.log('Starting audio playback');
+        // Reset if at the end
+        if (audio.currentTime >= audio.duration) {
+          audio.currentTime = 0;
+        }
+        await audio.play();
       }
     } catch (error) {
       console.error('Audio playback error:', error);
@@ -81,12 +126,17 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
   };
 
   const handleReplay = async () => {
-    if (!audioRef.current) return;
+    const audio = audioRef.current;
+    if (!audio || !canPlay) {
+      console.log('Audio not ready for replay');
+      return;
+    }
     
-    audioRef.current.currentTime = 0;
-    setCurrentTime(0);
     try {
-      await audioRef.current.play();
+      console.log('Replaying audio from start');
+      audio.currentTime = 0;
+      setCurrentTime(0);
+      await audio.play();
     } catch (error) {
       console.error('Audio replay error:', error);
     }
@@ -101,6 +151,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
   };
 
   const formatTime = (time: number) => {
+    if (!isFinite(time) || isNaN(time)) return '0:00';
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
@@ -120,7 +171,19 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
         {label}
       </div>
       
-      <audio ref={audioRef} src={getAudioUrl(src)} preload="metadata" />
+      <audio 
+        ref={audioRef} 
+        src={getAudioUrl(src)} 
+        preload="auto"
+        crossOrigin="anonymous"
+      />
+      
+      {/* Loading Indicator */}
+      {isLoading && (
+        <div className="text-green-400 text-xs text-center">
+          Loading audio...
+        </div>
+      )}
       
       {/* Progress Bar */}
       <div className="w-full bg-green-900/30 border border-green-600 h-1">
@@ -139,21 +202,36 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
       <div className="flex justify-center space-x-2">
         <button
           onClick={handlePlayPause}
-          className="bg-green-600 hover:bg-green-500 text-black font-bold py-1 px-3 text-xs transition-colors border border-green-400"
+          disabled={isLoading || !canPlay}
+          className={`font-bold py-1 px-3 text-xs transition-colors border ${
+            isLoading || !canPlay
+              ? 'border-gray-600 text-gray-600 cursor-not-allowed'
+              : 'bg-green-600 hover:bg-green-500 text-black border-green-400'
+          }`}
         >
-          {isPlaying ? '[PAUSE]' : '[PLAY]'}
+          {isLoading ? '[LOADING]' : isPlaying ? '[PAUSE]' : '[PLAY]'}
         </button>
         
         <button
           onClick={handleReplay}
-          className="border border-green-400 text-green-400 hover:bg-green-400 hover:text-black font-bold py-1 px-3 text-xs transition-colors"
+          disabled={isLoading || !canPlay}
+          className={`font-bold py-1 px-3 text-xs transition-colors border ${
+            isLoading || !canPlay
+              ? 'border-gray-600 text-gray-600 cursor-not-allowed'
+              : 'border-green-400 text-green-400 hover:bg-green-400 hover:text-black'
+          }`}
         >
           [REPLAY]
         </button>
         
         <button
           onClick={toggleSpeed}
-          className="border border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black font-bold py-1 px-3 text-xs transition-colors"
+          disabled={isLoading || !canPlay}
+          className={`font-bold py-1 px-3 text-xs transition-colors border ${
+            isLoading || !canPlay
+              ? 'border-gray-600 text-gray-600 cursor-not-allowed'
+              : 'border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black'
+          }`}
         >
           [{playbackRate}x SPEED]
         </button>
