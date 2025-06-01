@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import WelcomeScreen from '../components/WelcomeScreen';
 import MissionBriefing from '../components/MissionBriefing';
@@ -83,6 +82,11 @@ const Index = () => {
   const handleStartClues = () => {
     console.log('START CLUES clicked - setting phase to clue');
     setCurrentPhase('clue');
+  };
+
+  const handleBackToWelcome = () => {
+    console.log('BACK TO WELCOME clicked - returning to welcome screen');
+    setCurrentPhase('welcome');
   };
 
   const handleCodeSubmit = (code: string) => {
@@ -188,7 +192,10 @@ const Index = () => {
       )}
       
       {currentPhase === 'briefing' && (
-        <MissionBriefing onStartClues={handleStartClues} />
+        <MissionBriefing 
+          onStartClues={handleStartClues} 
+          onBackToWelcome={handleBackToWelcome}
+        />
       )}
       
       {currentPhase === 'clue' && (

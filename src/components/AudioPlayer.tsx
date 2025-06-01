@@ -19,27 +19,12 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [hasPlayed, setHasPlayed] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const progressBarRef = useRef<HTMLDivElement>(null);
 
-  // EMERGENCY: Force enable all controls immediately
-  useEffect(() => {
-    // Force enable all buttons on the page
-    const forceEnableAllButtons = () => {
-      document.querySelectorAll('button').forEach(btn => {
-        btn.disabled = false;
-        btn.removeAttribute('disabled');
-        btn.style.opacity = '1';
-        btn.style.pointerEvents = 'auto';
-        btn.style.cursor = 'pointer';
-      });
-    };
-
-    // Run immediately and repeatedly
-    forceEnableAllButtons();
-    const interval = setInterval(forceEnableAllButtons, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
+  const playbackSpeeds = [0.5, 1, 1.25, 1.5, 2];
+  const currentSpeedIndex = playbackSpeeds.indexOf(playbackRate);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -47,6 +32,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
 
     const handleLoadedMetadata = () => {
       setDuration(audio.duration);
+      setIsLoading(false);
     };
 
     const handleTimeUpdate = () => {
@@ -71,12 +57,21 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
       setIsPlaying(false);
     };
 
-    // Add all event listeners
+    const handleCanPlay = () => {
+      setIsLoading(false);
+    };
+
     audio.addEventListener('loadedmetadata', handleLoadedMetadata);
     audio.addEventListener('timeupdate', handleTimeUpdate);
     audio.addEventListener('ended', handleEnded);
     audio.addEventListener('play', handlePlay);
     audio.addEventListener('pause', handlePause);
+    audio.addEventListener('canplay', handleCanPlay);
+
+    // Force enable controls after timeout
+    const timeout = setTimeout(() => {
+      setIsLoading(false);
+    }, 8000);
 
     return () => {
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
@@ -84,6 +79,8 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
       audio.removeEventListener('ended', handleEnded);
       audio.removeEventListener('play', handlePlay);
       audio.removeEventListener('pause', handlePause);
+      audio.removeEventListener('canplay', handleCanPlay);
+      clearTimeout(timeout);
     };
   }, [onPlay, onEnded, hasPlayed]);
 
@@ -102,7 +99,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
       }
     } catch (error) {
       console.error('Audio playback error:', error);
-      // Still trigger onPlay for progression
+      setIsLoading(false);
       if (!hasPlayed) {
         setHasPlayed(true);
         onPlay?.();
@@ -123,8 +120,32 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
     }
   };
 
-  const toggleSpeed = () => {
-    const newRate = playbackRate === 1 ? 1.5 : 1;
+  const handleSkip = (seconds: number) => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    
+    const newTime = Math.max(0, Math.min(audio.duration, audio.currentTime + seconds));
+    audio.currentTime = newTime;
+    setCurrentTime(newTime);
+  };
+
+  const handleProgressBarClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const audio = audioRef.current;
+    if (!audio || !progressBarRef.current) return;
+    
+    const rect = progressBarRef.current.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const width = rect.width;
+    const percentage = clickX / width;
+    const newTime = audio.duration * percentage;
+    
+    audio.currentTime = newTime;
+    setCurrentTime(newTime);
+  };
+
+  const handleSpeedChange = () => {
+    const nextIndex = (currentSpeedIndex + 1) % playbackSpeeds.length;
+    const newRate = playbackSpeeds[nextIndex];
     setPlaybackRate(newRate);
     if (audioRef.current) {
       audioRef.current.playbackRate = newRate;
@@ -153,43 +174,78 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
         crossOrigin="anonymous"
       />
       
-      {/* Progress Bar */}
-      <div className="w-full bg-green-900/30 border border-green-600 h-1">
+      {/* Enhanced Progress Bar - Clickable for seeking */}
+      <div 
+        ref={progressBarRef}
+        className="w-full bg-green-900/30 border border-green-600 h-3 cursor-pointer relative hover:bg-green-900/50"
+        onClick={handleProgressBarClick}
+      >
         <div 
           className="bg-green-400 h-full transition-all duration-200"
           style={{ width: `${progressPercentage}%` }}
+        />
+        {/* Current position indicator */}
+        <div 
+          className="absolute top-0 w-1 h-full bg-green-200"
+          style={{ left: `${progressPercentage}%` }}
         />
       </div>
       
       {/* Time Display */}
       <div className="text-green-400 text-xs text-center font-mono">
-        {formatTime(currentTime)} / {formatTime(duration)}
+        {isLoading ? 'Loading audio...' : `${formatTime(currentTime)} / ${formatTime(duration)}`}
       </div>
       
-      {/* Controls - ALWAYS ENABLED */}
-      <div className="flex justify-center space-x-2">
+      {/* Enhanced Controls */}
+      <div className="flex justify-center space-x-1 flex-wrap">
+        {/* Skip backward 10s */}
+        <button
+          onClick={() => handleSkip(-10)}
+          disabled={isLoading}
+          className="border-green-400 text-green-400 hover:bg-green-400 hover:text-black font-bold py-1 px-2 text-xs transition-colors border"
+          style={{ opacity: 1, pointerEvents: 'auto' }}
+        >
+          [{'<<10s'}]
+        </button>
+        
+        {/* Play/Pause */}
         <button
           onClick={handlePlayPause}
+          disabled={isLoading}
           className="bg-green-600 hover:bg-green-500 text-black border border-green-400 font-bold py-1 px-3 text-xs transition-colors"
           style={{ opacity: 1, pointerEvents: 'auto' }}
         >
-          {isPlaying ? '[PAUSE]' : '[PLAY]'}
+          {isLoading ? '[LOADING]' : isPlaying ? '[PAUSE]' : '[PLAY]'}
         </button>
         
+        {/* Skip forward 10s */}
+        <button
+          onClick={() => handleSkip(10)}
+          disabled={isLoading}
+          className="border-green-400 text-green-400 hover:bg-green-400 hover:text-black font-bold py-1 px-2 text-xs transition-colors border"
+          style={{ opacity: 1, pointerEvents: 'auto' }}
+        >
+          [10s{'>>'}]
+        </button>
+        
+        {/* Replay */}
         <button
           onClick={handleReplay}
+          disabled={isLoading}
           className="border-green-400 text-green-400 hover:bg-green-400 hover:text-black font-bold py-1 px-3 text-xs transition-colors border"
           style={{ opacity: 1, pointerEvents: 'auto' }}
         >
           [REPLAY]
         </button>
         
+        {/* Enhanced Speed Control */}
         <button
-          onClick={toggleSpeed}
+          onClick={handleSpeedChange}
+          disabled={isLoading}
           className="border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black font-bold py-1 px-3 text-xs transition-colors border"
           style={{ opacity: 1, pointerEvents: 'auto' }}
         >
-          [{playbackRate}x SPEED]
+          [{playbackRate}x]
         </button>
       </div>
     </div>
