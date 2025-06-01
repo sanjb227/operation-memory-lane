@@ -4,6 +4,7 @@ import MissionBriefing from '../components/MissionBriefing';
 import ClueInterface from '../components/ClueInterface';
 import Checkpoint7Handler from '../components/Checkpoint7Handler';
 import MissionAccomplished from '../components/MissionAccomplished';
+import SystemMessages from '../components/SystemMessages';
 import { GamePhase } from '../types/game';
 import { useGameProgress } from '../hooks/useGameProgress';
 
@@ -66,6 +67,49 @@ const Index = () => {
   // Monitor phase changes for debugging
   useEffect(() => {
     console.log('Current phase changed to:', currentPhase);
+  }, [currentPhase]);
+
+  // Add agent feedback system
+  useEffect(() => {
+    const addAgentFeedback = () => {
+      document.querySelectorAll('button').forEach(btn => {
+        const existingHandler = btn.onclick;
+        btn.onclick = (e) => {
+          // Brief screen flash
+          document.body.style.filter = 'brightness(1.2)';
+          setTimeout(() => document.body.style.filter = 'brightness(1)', 100);
+          
+          // Show command executed feedback
+          const feedback = document.createElement('div');
+          feedback.textContent = 'COMMAND EXECUTED';
+          feedback.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 255, 0, 0.2);
+            color: #00ff00;
+            padding: 5px 10px;
+            font-family: monospace;
+            font-size: 14px;
+            border: 1px solid #00ff00;
+            z-index: 1000;
+          `;
+          
+          document.body.appendChild(feedback);
+          setTimeout(() => feedback.remove(), 1500);
+
+          // Call original handler if it exists
+          if (existingHandler) {
+            existingHandler.call(btn, e);
+          }
+        };
+      });
+    };
+
+    // Add feedback to buttons after a short delay to ensure they're rendered
+    const timeout = setTimeout(addAgentFeedback, 1000);
+    return () => clearTimeout(timeout);
   }, [currentPhase]);
 
   const handleBeginMission = () => {
@@ -180,6 +224,15 @@ const Index = () => {
       {/* UCL Logo Watermark */}
       <div className="fixed top-4 right-4 opacity-20 text-green-600 text-sm font-bold z-10">
         UCL
+      </div>
+
+      {/* System Messages Component */}
+      <SystemMessages />
+
+      {/* Mission Timer */}
+      <div className="fixed bottom-4 left-4 text-green-400 text-xs font-mono opacity-60 z-10">
+        <div>MISSION TIMER: {Math.floor(Date.now() / 1000) % 86400} SEC</div>
+        <div>LOCATION: CLASSIFIED</div>
       </div>
 
       {/* Checkpoint 7 Handler Modal */}
