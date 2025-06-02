@@ -37,8 +37,43 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Enhanced mobile detection for Checkpoint 4
+  const isMobileDevice = () => {
+    return (
+      window.innerWidth < 1024 ||
+      /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+      'ontouchstart' in window
+    );
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Special handling for Checkpoint 4 - block mobile password entry
+    if (currentCheckpoint === 3 && isMobileDevice()) {
+      // Show mobile blocked message
+      const feedback = document.createElement('div');
+      feedback.textContent = '🖥️ DESKTOP ACCESS REQUIRED - This checkpoint must be completed on a desktop computer for security protocols';
+      feedback.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(255, 255, 0, 0.2);
+        color: #ffff00;
+        padding: 10px 15px;
+        font-family: monospace;
+        font-size: 12px;
+        border: 1px solid #ffff00;
+        z-index: 1000;
+        max-width: 90%;
+        text-align: center;
+      `;
+      document.body.appendChild(feedback);
+      setTimeout(() => feedback.remove(), 4000);
+      return;
+    }
+    
     if (inputCode.trim()) {
       onCodeSubmit(inputCode);
       setInputCode('');
@@ -212,48 +247,35 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
             {isSecondToLast ? "FINAL TRANSMISSION" : "ENCRYPTED MESSAGE"}
           </div>
           
-          {isCheckpoint4 && !isDesktop ? (
-            <div className="text-center text-yellow-400">
-              <div className="text-lg mb-4">🖥️</div>
-              <div className="text-sm font-bold mb-2">DESKTOP ACCESS REQUIRED</div>
-              <div className="text-xs leading-relaxed">
-                This checkpoint requires a larger screen for security protocols. 
-                Access from a desktop or tablet device to continue your mission.
-              </div>
-            </div>
-          ) : (
-            <div className="text-xs leading-relaxed whitespace-pre-line">
-              {clueText}
-            </div>
-          )}
+          <div className="text-xs leading-relaxed whitespace-pre-line">
+            {clueText}
+          </div>
         </div>
 
-        {/* Code Input */}
-        {(!isCheckpoint4 || isDesktop) && (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="border border-green-400 p-4 bg-black/90">
-              <label className="block text-xs font-bold mb-2 text-green-300">
-                ENTER CODE:
-              </label>
-              <input
-                type="text"
-                value={inputCode}
-                onChange={(e) => setInputCode(e.target.value.toUpperCase())}
-                className="w-full bg-black border border-green-600 text-green-400 px-3 py-2 text-sm font-mono focus:outline-none focus:border-green-300"
-                placeholder="TYPE CODE HERE..."
-                maxLength={20}
-              />
-            </div>
-            
-            <button
-              type="submit"
-              className="w-full bg-green-600 hover:bg-green-500 text-black font-bold py-3 px-4 transition-colors duration-200 border border-green-400 disabled:opacity-50"
-              disabled={!inputCode.trim()}
-            >
-              [SUBMIT CODE]
-            </button>
-          </form>
-        )}
+        {/* Code Input - Always show for all checkpoints */}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="border border-green-400 p-4 bg-black/90">
+            <label className="block text-xs font-bold mb-2 text-green-300">
+              ENTER CODE:
+            </label>
+            <input
+              type="text"
+              value={inputCode}
+              onChange={(e) => setInputCode(e.target.value.toUpperCase())}
+              className="w-full bg-black border border-green-600 text-green-400 px-3 py-2 text-sm font-mono focus:outline-none focus:border-green-300"
+              placeholder="TYPE CODE HERE..."
+              maxLength={20}
+            />
+          </div>
+          
+          <button
+            type="submit"
+            className="w-full bg-green-600 hover:bg-green-500 text-black font-bold py-3 px-4 transition-colors duration-200 border border-green-400 disabled:opacity-50"
+            disabled={!inputCode.trim()}
+          >
+            [SUBMIT CODE]
+          </button>
+        </form>
 
         {/* Lifeline Button */}
         <button
