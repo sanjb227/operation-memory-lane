@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { getClueText, getLifelineText } from '../utils/clueData';
 
@@ -37,7 +36,7 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Enhanced mobile detection for Checkpoint 4
+  // Enhanced mobile detection for Checkpoint 3 (was previously Checkpoint 4)
   const isMobileDevice = () => {
     return (
       window.innerWidth < 1024 ||
@@ -49,8 +48,8 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Special handling for Checkpoint 4 - block mobile password entry
-    if (currentCheckpoint === 3 && isMobileDevice()) {
+    // Special handling for Checkpoint 3 (Science Library) - block mobile password entry
+    if (currentCheckpoint === 2 && isMobileDevice()) {
       // Show mobile blocked message
       const feedback = document.createElement('div');
       feedback.textContent = '🖥️ DESKTOP ACCESS REQUIRED - This checkpoint must be completed on a desktop computer for security protocols';
@@ -120,7 +119,7 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
 
   const clueText = getClueText(currentCheckpoint);
   const isSecondToLast = currentCheckpoint === totalCheckpoints - 2;
-  const isCheckpoint4 = currentCheckpoint === 3;
+  const isCheckpoint3ScienceLibrary = currentCheckpoint === 2; // Now position 2 (0-indexed)
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
@@ -135,8 +134,8 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
           </button>
         </div>
 
-        {/* Desktop Hint for Checkpoint 4 Only */}
-        {isCheckpoint4 && isDesktop && (
+        {/* Desktop Hint for Checkpoint 3 (Science Library) Only */}
+        {isCheckpoint3ScienceLibrary && isDesktop && (
           <div className="desktop-hint">
             <div className="text-xs font-bold mb-1">DESKTOP ACCESS GRANTED</div>
             <div className="text-xs">PASSWORD: SCI SPY</div>

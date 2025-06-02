@@ -20,10 +20,10 @@ const MysteriousLanding: React.FC<MysteriousLandingProps> = ({ onProceed }) => {
         setCurrentMessage(prev => prev + 1);
       } else {
         clearInterval(messageInterval);
-        // Show button after only 2 seconds instead of long delay
-        setTimeout(() => setShowButton(true), 2000);
+        // Show button after only 1 second for fast loading
+        setTimeout(() => setShowButton(true), 1000);
       }
-    }, 1500); // Reduced from 2500 to 1500ms
+    }, 1000); // Reduced to 1000ms for faster progression
 
     return () => clearInterval(messageInterval);
   }, [currentMessage, messages.length]);
@@ -45,7 +45,7 @@ const MysteriousLanding: React.FC<MysteriousLandingProps> = ({ onProceed }) => {
           key={currentMessage}
           className="typewriter mb-8"
           style={{
-            animation: 'typing 1.5s steps(40, end), blink-caret .75s step-end infinite'
+            animation: 'typing 1s steps(40, end), blink-caret .75s step-end infinite'
           }}
         >
           {messages[currentMessage]}

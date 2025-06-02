@@ -11,14 +11,14 @@ import { GamePhase } from '../types/game';
 import { useGameProgress } from '../hooks/useGameProgress';
 
 const correctCodes = [
-  "BAGGAGE CLAIMED",  // Checkpoint 1
-  "TAP SECRET",       // Checkpoint 2  
-  "READ BETWEEN",     // Checkpoint 3
-  "SCI SPY",          // Checkpoint 4
-  "BUDDING GENIUS",   // Checkpoint 5
-  "MUFFIN MISSION",   // Checkpoint 6
-  "STAIRWAY SPY",     // Checkpoint 7
-  "ARMCHAIR AGENT"    // Checkpoint 8 (final)
+  "BAGGAGE CLAIMED",  // Checkpoint 1 (unchanged)
+  "TAP SECRET",       // Checkpoint 2 (unchanged)
+  "SCI SPY",          // Checkpoint 3 (moved from position 4)
+  "READ BETWEEN",     // Checkpoint 4 (moved from position 3)
+  "BUDDING GENIUS",   // Checkpoint 5 (unchanged)
+  "STAIRWAY SPY",     // Checkpoint 6 (moved from position 7)
+  "MUFFIN MISSION",   // Checkpoint 7 (moved from position 6)
+  "ARMCHAIR AGENT"    // Checkpoint 8 (unchanged)
 ];
 
 const Index = () => {
