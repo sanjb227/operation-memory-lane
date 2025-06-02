@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -538,4 +537,15 @@ body::before {
 .start-over-btn:hover {
     background: rgba(0, 255, 0, 0.3) !important;
     box-shadow: 0 0 10px rgba(0, 255, 0, 0.5) !important;
+}
+
+/* Blinking text animation for mission critical alerts */
+.blink-text {
+    animation: blink 1s linear infinite;
+}
+
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0; }
+    100% { opacity: 1; }
 }

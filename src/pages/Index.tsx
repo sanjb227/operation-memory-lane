@@ -3,6 +3,7 @@ import WelcomeScreen from '../components/WelcomeScreen';
 import MissionBriefing from '../components/MissionBriefing';
 import ClueInterface from '../components/ClueInterface';
 import Checkpoint7Handler from '../components/Checkpoint7Handler';
+import PreFinalCheckpointModal from '../components/PreFinalCheckpointModal';
 import MissionAccomplished from '../components/MissionAccomplished';
 import MysteriousLanding from '../components/MysteriousLanding';
 import SystemMessages from '../components/SystemMessages';
@@ -10,14 +11,14 @@ import { GamePhase } from '../types/game';
 import { useGameProgress } from '../hooks/useGameProgress';
 
 const correctCodes = [
-  "HANDBAG",     // Checkpoint 1
-  "CLASSROOM",   // Checkpoint 2  
-  "BOOKMARK",    // Checkpoint 3
-  "LABCOAT",     // Checkpoint 4
-  "ATTENDANCE",  // Checkpoint 5
-  "ESPRESSO",    // Checkpoint 6
-  "PHOTOSHOOT",  // Checkpoint 7 (was 8)
-  "ALLNIGHT"     // Checkpoint 8 (was 9, final)
+  "BAGGAGE CLAIMED",  // Checkpoint 1
+  "TAP SECRET",       // Checkpoint 2  
+  "READ BETWEEN",     // Checkpoint 3
+  "SCI SPY",          // Checkpoint 4
+  "BUDDING GENIUS",   // Checkpoint 5
+  "MUFFIN MISSION",   // Checkpoint 6
+  "STAIRWAY SPY",     // Checkpoint 7
+  "ARMCHAIR AGENT"    // Checkpoint 8 (final)
 ];
 
 const Index = () => {
@@ -28,6 +29,7 @@ const Index = () => {
   const [showError, setShowError] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [showCheckpoint7Handler, setShowCheckpoint7Handler] = useState(false);
+  const [showPreFinalModal, setShowPreFinalModal] = useState(false);
   const [progressLoaded, setProgressLoaded] = useState(false);
   const [showMysteriousLanding, setShowMysteriousLanding] = useState(true);
 
@@ -118,7 +120,7 @@ const Index = () => {
     return () => clearTimeout(timeout);
   }, [currentPhase]);
 
-  const handleMysteriousLandingProceed = () => {
+  const handleMysteriousLanding = () => {
     setShowMysteriousLanding(false);
   };
 
@@ -127,7 +129,6 @@ const Index = () => {
     console.log('Setting phase to briefing...');
     setCurrentPhase('briefing');
     
-    // Save initial progress
     if (sessionId && progressLoaded) {
       saveProgress(0, 3, []);
     }
@@ -150,7 +151,6 @@ const Index = () => {
     console.log('Code submitted:', trimmedCode, 'Expected:', correctCode);
     
     if (trimmedCode === correctCode) {
-      // Correct code
       const newEnteredCodes = [...enteredCodes, trimmedCode];
       setEnteredCodes(newEnteredCodes);
       setShowSuccess(true);
@@ -164,28 +164,30 @@ const Index = () => {
           // Show checkpoint 7 handler before checkpoint 7 (index 6)
           if (nextCheckpoint === 6) {
             setShowCheckpoint7Handler(true);
-            // Save progress before showing handler
+            if (sessionId && progressLoaded) {
+              saveProgress(nextCheckpoint, lifelinesRemaining, newEnteredCodes);
+            }
+          }
+          // Show pre-final modal before final checkpoint (index 7)
+          else if (nextCheckpoint === 7) {
+            setShowPreFinalModal(true);
             if (sessionId && progressLoaded) {
               saveProgress(nextCheckpoint, lifelinesRemaining, newEnteredCodes);
             }
           } else {
             setCurrentCheckpoint(nextCheckpoint);
-            // Save progress
             if (sessionId && progressLoaded) {
               saveProgress(nextCheckpoint, lifelinesRemaining, newEnteredCodes);
             }
           }
         } else {
-          // Mission complete
           setCurrentPhase('final');
-          // Save final progress
           if (sessionId && progressLoaded) {
             saveProgress(correctCodes.length, lifelinesRemaining, newEnteredCodes);
           }
         }
       }, 2000);
     } else {
-      // Incorrect code
       setShowError(true);
       setShowSuccess(false);
       setTimeout(() => setShowError(false), 3000);
@@ -197,12 +199,11 @@ const Index = () => {
       const newLifelines = lifelinesRemaining - 1;
       setLifelinesRemaining(newLifelines);
       
-      // Save updated lifelines
       if (sessionId && progressLoaded) {
         saveProgress(currentCheckpoint, newLifelines, enteredCodes);
       }
       
-      return true; // Indicate lifeline was used
+      return true;
     }
     return false;
   };
@@ -210,7 +211,13 @@ const Index = () => {
   const handleCheckpoint7Continue = () => {
     console.log('Checkpoint 7 handler - continuing to clue');
     setShowCheckpoint7Handler(false);
-    setCurrentCheckpoint(6); // Checkpoint 7 (index 6)
+    setCurrentCheckpoint(6);
+  };
+
+  const handlePreFinalContinue = () => {
+    console.log('Pre-final checkpoint - continuing to final clue');
+    setShowPreFinalModal(false);
+    setCurrentCheckpoint(7);
   };
 
   // Show loading while progress is being loaded
@@ -231,7 +238,7 @@ const Index = () => {
 
   // Show mysterious landing for new users
   if (showMysteriousLanding) {
-    return <MysteriousLanding onProceed={handleMysteriousLandingProceed} />;
+    return <MysteriousLanding onProceed={handleMysteriousLanding} />;
   }
 
   return (
@@ -253,6 +260,11 @@ const Index = () => {
       {/* Checkpoint 7 Handler Modal */}
       {showCheckpoint7Handler && (
         <Checkpoint7Handler onContinue={handleCheckpoint7Continue} />
+      )}
+
+      {/* Pre-Final Checkpoint Modal */}
+      {showPreFinalModal && (
+        <PreFinalCheckpointModal onProceed={handlePreFinalContinue} />
       )}
 
       {currentPhase === 'welcome' && (

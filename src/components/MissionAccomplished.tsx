@@ -68,6 +68,8 @@ const MissionAccomplished: React.FC = () => {
   };
 
   const handleStartOver = () => {
+    // Reset to welcome transmission page instead of mission accomplished
+    setShowCelebration(false);
     window.location.href = '/';
   };
 

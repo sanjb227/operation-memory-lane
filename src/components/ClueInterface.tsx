@@ -25,13 +25,13 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
   const [lifelineText, setLifelineText] = useState('');
   const [showLifeline, setShowLifeline] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
+  const [showClueSupport, setShowClueSupport] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (inputCode.trim()) {
       onCodeSubmit(inputCode);
       setInputCode('');
-      // Clear lifeline text when moving to next checkpoint
       setShowLifeline(false);
       setLifelineText('');
     }
@@ -43,8 +43,11 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
       const lifeline = getLifelineText(currentCheckpoint);
       setLifelineText(lifeline);
       setShowLifeline(true);
-      // No timer - lifeline text stays visible permanently
     }
+  };
+
+  const handleClueSupportClick = () => {
+    setShowClueSupport(true);
   };
 
   const clueText = getClueText(currentCheckpoint);
@@ -67,7 +70,7 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
         {currentCheckpoint === 3 && (
           <div className="desktop-hint">
             <div className="text-xs font-bold mb-1">DESKTOP ACCESS GRANTED</div>
-            <div className="text-xs">PASSWORD: LABCOAT</div>
+            <div className="text-xs">PASSWORD: SCI SPY</div>
           </div>
         )}
 
@@ -92,6 +95,28 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
                 className="mt-4 w-full bg-green-600 hover:bg-green-500 text-black font-bold py-2 px-4 transition-colors"
               >
                 [CLOSE]
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Clue Support Popup */}
+        {showClueSupport && (
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+            <div className="bg-black border border-yellow-400 p-6 max-w-sm w-full">
+              <div className="text-yellow-300 font-bold mb-4 text-center">
+                ⚠️ CLUE SUPPORT REQUEST
+              </div>
+              <div className="text-xs leading-relaxed text-yellow-400 space-y-2">
+                <p>If you suspect a clue has been moved or is missing, message Agent San immediately.</p>
+                <p>Be prepared to join a video call to resolve the issue.</p>
+                <p className="text-red-400 font-bold">DO NOT PROCEED without confirming with Agent San first.</p>
+              </div>
+              <button
+                onClick={() => setShowClueSupport(false)}
+                className="mt-4 w-full bg-yellow-600 hover:bg-yellow-500 text-black font-bold py-2 px-4 transition-colors"
+              >
+                [UNDERSTOOD]
               </button>
             </div>
           </div>
@@ -154,6 +179,14 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
           disabled={lifelinesRemaining === 0}
         >
           {lifelinesRemaining > 0 ? '[REQUEST LIFELINE]' : '[NO LIFELINES REMAINING]'}
+        </button>
+
+        {/* Clue Missing Support Button */}
+        <button
+          onClick={handleClueSupportClick}
+          className="w-full py-2 px-4 border border-orange-400 text-orange-400 hover:bg-orange-400 hover:text-black text-sm transition-colors duration-200"
+        >
+          [CLUE MISSING?]
         </button>
 
         {/* Persistent Lifeline Display */}
