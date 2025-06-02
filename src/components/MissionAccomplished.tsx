@@ -67,25 +67,29 @@ const MissionAccomplished: React.FC = () => {
     setShowCelebration(false);
   };
 
+  const handleStartOver = () => {
+    window.location.href = '/';
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       {/* Agent Info Display */}
-      <div className="fixed top-4 left-4 text-green-400 text-xs font-mono opacity-60 z-10">
+      <div className="fixed top-4 left-4 text-green-400 text-xs font-mono opacity-60 z-10 agent-info-bar">
         <div>AGENT: AISHU</div>
         <div>CLEARANCE: ALPHA</div>
         <div>ENCRYPTION: AES-256 ACTIVE</div>
       </div>
 
       {/* Mission Info Display */}
-      <div className="fixed top-4 right-4 text-green-400 text-xs font-mono opacity-60 z-10">
+      <div className="fixed top-4 right-4 text-green-400 text-xs font-mono opacity-60 z-10 agent-info-bar">
         <div>OPERATION: MEMORY LANE</div>
         <div>HANDLER: ONLINE • SECURE CHANNEL</div>
         <div>STATUS: MISSION COMPLETE</div>
       </div>
 
-      <div className="max-w-md w-full space-y-6">
-        <div className="border border-green-400 p-6 bg-black/90 terminal-glow">
-          <div className="text-lg font-bold mb-4 text-green-300 terminal-text">
+      <div className="max-w-md w-full space-y-6 page-container">
+        <div className="border border-green-400 p-6 bg-black/90 terminal-glow terminal-box">
+          <div className="text-lg font-bold mb-4 text-green-300 terminal-text mission-title">
             MISSION ACCOMPLISHED
           </div>
           
@@ -93,11 +97,13 @@ const MissionAccomplished: React.FC = () => {
             Transmission from HQ...
           </div>
 
-          <AudioPlayer
-            src={audioUrl}
-            label="MISSION ACCOMPLISHED"
-            onPlay={handleAudioPlay}
-          />
+          <div className="audio-container">
+            <AudioPlayer
+              src={audioUrl}
+              label="MISSION ACCOMPLISHED"
+              onPlay={handleAudioPlay}
+            />
+          </div>
 
           <button
             onClick={handleCompleteClick}
@@ -111,23 +117,31 @@ const MissionAccomplished: React.FC = () => {
 
       {/* Success Celebration Overlay */}
       {showCelebration && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-          <div className="text-center border-2 border-green-400 p-12 bg-black/90 terminal-glow">
-            <h1 className="text-5xl font-bold mb-6 text-green-300 glow-text animate-pulse">
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="text-center border-2 border-green-400 p-8 bg-black/90 terminal-glow success-container">
+            <h1 className="success-title font-bold mb-6 text-green-300 glow-text animate-pulse">
               MISSION ACCOMPLISHED
             </h1>
-            <p className="text-2xl mb-4 text-green-400">
+            <p className="success-message mb-4 text-green-400">
               EXCELLENT WORK, AGENT AISHU
             </p>
-            <p className="text-lg mb-8 text-green-400">
+            <p className="success-message mb-8 text-green-400">
               CONGRATULATIONS ON YOUR GRADUATION!
             </p>
-            <button 
-              onClick={closeCelebration}
-              className="bg-green-600 hover:bg-green-500 text-black border border-green-400 px-8 py-4 text-lg font-bold font-mono transition-all duration-200 agent-button"
-            >
-              MISSION COMPLETE
-            </button>
+            <div className="button-row">
+              <button 
+                onClick={closeCelebration}
+                className="bg-green-600 hover:bg-green-500 text-black border border-green-400 px-8 py-4 text-lg font-bold font-mono transition-all duration-200 agent-button mr-4"
+              >
+                MISSION COMPLETE
+              </button>
+              <button 
+                onClick={handleStartOver}
+                className="start-over-btn"
+              >
+                ↻ START OVER
+              </button>
+            </div>
           </div>
         </div>
       )}

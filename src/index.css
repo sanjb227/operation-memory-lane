@@ -94,11 +94,163 @@
 @layer base {
   * {
     @apply border-border;
+    box-sizing: border-box;
   }
 
   body {
     @apply bg-background text-foreground;
+    margin: 0;
+    padding: 10px;
+    min-height: 100vh;
+    overflow-x: hidden;
   }
+}
+
+/* Mobile-First Responsive Design Framework */
+.page-container {
+    max-width: 100vw;
+    padding: 15px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+.terminal-box {
+    border: 1px solid #00ff00;
+    padding: 15px;
+    margin: 10px 0;
+    background: rgba(0, 0, 0, 0.8);
+    max-width: 100%;
+    overflow: visible;
+}
+
+.button-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin: 15px 0;
+}
+
+.button-row button {
+    flex: 1;
+    min-width: 80px;
+    max-width: 120px;
+    padding: 8px 12px;
+    font-size: 12px;
+}
+
+/* Mission Header Mobile Fixes */
+.mission-header {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+    flex-wrap: wrap;
+    overflow: visible;
+}
+
+.agent-info-bar {
+    font-size: 10px;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-height: 15px;
+}
+
+/* Success Page Mobile Fixes */
+.success-container {
+    padding: 20px 15px;
+    margin: 10px;
+    box-sizing: border-box;
+    max-width: calc(100vw - 20px);
+    overflow: visible;
+}
+
+.success-title {
+    font-size: clamp(24px, 8vw, 48px);
+    line-height: 1.1;
+    margin-bottom: 20px;
+    word-wrap: break-word;
+}
+
+.success-message {
+    font-size: clamp(14px, 4vw, 18px);
+    line-height: 1.3;
+    margin: 15px 0;
+}
+
+/* Audio Player Mobile Optimization */
+.audio-container {
+    width: 100%;
+    max-width: 100%;
+    padding: 15px;
+    box-sizing: border-box;
+}
+
+.audio-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin: 15px 0;
+}
+
+.audio-progress-bar {
+    width: 100%;
+    height: 8px;
+    margin: 10px 0;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+/* Text Responsiveness */
+h1, h2, h3, p, div {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+}
+
+/* Mobile Breakpoints */
+@media (max-width: 768px) {
+    .agent-info-bar {
+        font-size: 8px;
+        display: block;
+        white-space: normal;
+        word-wrap: break-word;
+    }
+    
+    .mission-title {
+        font-size: 18px;
+        margin: 10px 0;
+    }
+    
+    .audio-controls {
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+    }
+    
+    .audio-controls button {
+        font-size: 10px;
+        padding: 6px 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .success-container {
+        padding: 15px 10px;
+        margin: 5px;
+    }
+    
+    .button-row {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .button-row button {
+        width: 80%;
+        max-width: 200px;
+        margin: 5px 0;
+    }
 }
 
 /* Desktop hint for checkpoint 4 - Hidden on mobile, visible on desktop */
@@ -315,4 +467,75 @@ body::before {
 .speed-btn.active {
     background: #00ff00;
     color: black;
+}
+
+/* Mysterious Landing Page Styles */
+.mysterious-container {
+    text-align: center;
+    width: 100%;
+    max-width: 600px;
+}
+
+.typewriter {
+    overflow: hidden;
+    white-space: nowrap;
+    margin: 0 auto;
+    letter-spacing: .1em;
+    animation: typing 4s steps(40, end), blink-caret .75s step-end infinite;
+    border-right: 3px solid #00ff00;
+    font-size: clamp(14px, 4vw, 24px);
+}
+
+@keyframes typing {
+    from { width: 0 }
+    to { width: 100% }
+}
+
+@keyframes blink-caret {
+    from, to { border-color: transparent }
+    50% { border-color: #00ff00; }
+}
+
+.fade-in {
+    opacity: 0;
+    animation: fadeIn 2s ease-in 5s forwards;
+}
+
+@keyframes fadeIn {
+    to { opacity: 1; }
+}
+
+.access-btn {
+    background: transparent;
+    border: 1px solid #00ff00;
+    color: #00ff00;
+    padding: 12px 24px;
+    font-family: monospace;
+    cursor: pointer;
+    margin-top: 30px;
+    transition: all 0.3s;
+    min-height: 44px;
+}
+
+.access-btn:hover {
+    background: rgba(0, 255, 0, 0.1);
+    box-shadow: 0 0 10px #00ff00;
+}
+
+.start-over-btn {
+    background: rgba(0, 255, 0, 0.2) !important;
+    border: 1px solid #00ff00 !important;
+    color: #00ff00 !important;
+    padding: 8px 16px !important;
+    font-family: monospace !important;
+    font-size: 12px !important;
+    cursor: pointer !important;
+    margin-top: 20px !important;
+    transition: all 0.2s !important;
+    min-height: 44px !important;
+}
+
+.start-over-btn:hover {
+    background: rgba(0, 255, 0, 0.3) !important;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.5) !important;
 }

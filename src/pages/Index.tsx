@@ -4,6 +4,7 @@ import MissionBriefing from '../components/MissionBriefing';
 import ClueInterface from '../components/ClueInterface';
 import Checkpoint7Handler from '../components/Checkpoint7Handler';
 import MissionAccomplished from '../components/MissionAccomplished';
+import MysteriousLanding from '../components/MysteriousLanding';
 import SystemMessages from '../components/SystemMessages';
 import { GamePhase } from '../types/game';
 import { useGameProgress } from '../hooks/useGameProgress';
@@ -28,6 +29,7 @@ const Index = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [showCheckpoint7Handler, setShowCheckpoint7Handler] = useState(false);
   const [progressLoaded, setProgressLoaded] = useState(false);
+  const [showMysteriousLanding, setShowMysteriousLanding] = useState(true);
 
   const { sessionId, isLoading, saveProgress, loadProgress } = useGameProgress();
 
@@ -45,6 +47,9 @@ const Index = () => {
         setLifelinesRemaining(savedProgress.lifelines_remaining);
         setEnteredCodes(savedProgress.completed_checkpoints);
         
+        // Skip mysterious landing if progress exists
+        setShowMysteriousLanding(false);
+        
         // Determine phase based on checkpoint
         if (savedProgress.current_checkpoint >= correctCodes.length) {
           setCurrentPhase('final');
@@ -55,6 +60,7 @@ const Index = () => {
         }
       } else {
         console.log('No saved progress found, starting fresh');
+        // Keep mysterious landing for new users
         setCurrentPhase('welcome');
       }
       
@@ -111,6 +117,10 @@ const Index = () => {
     const timeout = setTimeout(addAgentFeedback, 1000);
     return () => clearTimeout(timeout);
   }, [currentPhase]);
+
+  const handleMysteriousLandingProceed = () => {
+    setShowMysteriousLanding(false);
+  };
 
   const handleBeginMission = () => {
     console.log('BEGIN MISSION clicked - current phase:', currentPhase);
@@ -217,6 +227,11 @@ const Index = () => {
         </div>
       </div>
     );
+  }
+
+  // Show mysterious landing for new users
+  if (showMysteriousLanding) {
+    return <MysteriousLanding onProceed={handleMysteriousLandingProceed} />;
   }
 
   return (
