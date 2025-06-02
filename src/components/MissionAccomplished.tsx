@@ -24,7 +24,6 @@ const MissionAccomplished: React.FC = () => {
       z-index: 9999;
     `;
     
-    // Create confetti pieces
     for (let i = 0; i < 50; i++) {
       const confetti = document.createElement('div');
       confetti.style.cssText = `
@@ -41,19 +40,15 @@ const MissionAccomplished: React.FC = () => {
     
     document.body.appendChild(confettiContainer);
     
-    // Remove confetti after animation
     setTimeout(() => confettiContainer.remove(), 5000);
 
-    // Show success overlay after 2 seconds
     setTimeout(() => {
       setShowCelebration(true);
     }, 2000);
 
-    // Play success sound
     const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF4');
-    audio.play().catch(() => {}); // Ignore if audio fails
+    audio.play().catch(() => {}); 
 
-    // Brief screen flash
     document.body.style.filter = 'brightness(1.2)';
     setTimeout(() => document.body.style.filter = 'brightness(1)', 100);
   };
@@ -68,9 +63,17 @@ const MissionAccomplished: React.FC = () => {
   };
 
   const handleStartOver = () => {
-    // Reset to welcome transmission page instead of mission accomplished
+    // Clear all stored progress and session data
+    localStorage.removeItem('treasure_hunt_session');
+    
+    // Clear any other stored data
+    localStorage.clear();
+    
+    // Reset the page completely
     setShowCelebration(false);
-    window.location.href = '/';
+    
+    // Force a complete page reload to reset all state
+    window.location.replace('/');
   };
 
   return (

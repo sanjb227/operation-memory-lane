@@ -73,32 +73,56 @@ Your final clue waits at the very end.`
   return clues[checkpoint] || "No clue available.";
 };
 
-export const getLifelineText = (checkpoint: number): string => {
+export const getLifelineText = (checkpoint: number): { coordinates: string; briefing: string } => {
   const lifelines = [
     // Checkpoint 1 - BAGGAGE CLAIMED
-    "The password is BAGGAGE CLAIMED. Obviously, you fool. Now, you wasted a lifeline.",
+    {
+      coordinates: "Your Current Location",
+      briefing: "The envelope is in the bag you are holding right now. Check all compartments immediately."
+    },
 
     // Checkpoint 2 - TAP SECRET
-    "The password is TAP SECRET. 1-19 Torrington Place, duh.",
+    {
+      coordinates: "51.522022847922706, -0.13446886094632468",
+      briefing: "The envelope is taped near the card reader outside room B07 in the basement. Approach with caution."
+    },
 
     // Checkpoint 3 - READ BETWEEN
-    "The password is READ BETWEEN. It's Waterstones, where you took your profile picture!",
+    {
+      coordinates: "51.522454165104975, -0.13215314814843546",
+      briefing: "The envelope is on the 2nd floor, at the windowsill near the Economics section in that reading nook with 3 large windows. Intelligence suggests it's well-concealed."
+    },
 
     // Checkpoint 4 - SCI SPY
-    "The password is SCI SPY. It's like I have to tell you everything. It was Science Library!!!",
+    {
+      coordinates: "51.52345342599542, -0.1325734055812665",
+      briefing: "The envelope is digital, accessible only by logging into a PC at this location and navigating to this website. Mobile access has been compromised for security."
+    },
 
     // Checkpoint 5 - BUDDING GENIUS
-    "The password is BUDDING GENIUS, which is something you should know about Gordon Square Gardens.",
+    {
+      coordinates: "51.52378626521969, -0.13017621987985467",
+      briefing: "The envelope is located on the black \"Welcome to Gordon Square Garden\" sign at the entrance near Momo's Garden Café. Exercise stealth."
+    },
 
     // Checkpoint 6 - MUFFIN MISSION
-    "The password is MUFFIN MISSION. Were you too socially anxious to say anything in Print Room Cafe?",
+    {
+      coordinates: "51.524104345112725, -0.13334199788377926",
+      briefing: "The envelope can be retrieved by asking the waiter at the counter \"I left something here—a small envelope.\" They may ask for your name. Use cover identity if necessary."
+    },
 
     // Checkpoint 7 - STAIRWAY SPY
-    "The password is STAIRWAY SPY. Remember?! That sunny day at the IOE stairs?!!!!",
+    {
+      coordinates: "51.52302308286143, -0.12790571724339553",
+      briefing: "The envelope is found after the first flight of stairs (outside) at the back exit on top of the light fixture. Watch for surveillance."
+    },
 
     // Checkpoint 8 - ARMCHAIR AGENT
-    "The password is ARMCHAIR AGENT. Have you genuinely blocked out that eventful night at the Student Centre in Group Study Room 4.04?"
+    {
+      coordinates: "51.52480024237343, -0.13243339957986588",
+      briefing: "The envelope is found inside Group Study Room 4.04. This is your final extraction point."
+    }
   ];
 
-  return lifelines[checkpoint] || "No lifeline available.";
+  return lifelines[checkpoint] || { coordinates: "No coordinates available.", briefing: "No briefing available." };
 };

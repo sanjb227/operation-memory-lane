@@ -49,10 +49,8 @@ const Index = () => {
         setLifelinesRemaining(savedProgress.lifelines_remaining);
         setEnteredCodes(savedProgress.completed_checkpoints);
         
-        // Skip mysterious landing if progress exists
         setShowMysteriousLanding(false);
         
-        // Determine phase based on checkpoint
         if (savedProgress.current_checkpoint >= correctCodes.length) {
           setCurrentPhase('final');
         } else if (savedProgress.current_checkpoint > 0) {
@@ -62,7 +60,6 @@ const Index = () => {
         }
       } else {
         console.log('No saved progress found, starting fresh');
-        // Keep mysterious landing for new users
         setCurrentPhase('welcome');
       }
       

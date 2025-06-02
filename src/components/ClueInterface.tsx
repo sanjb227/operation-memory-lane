@@ -22,10 +22,20 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
   totalCheckpoints
 }) => {
   const [inputCode, setInputCode] = useState('');
-  const [lifelineText, setLifelineText] = useState('');
+  const [lifelineData, setLifelineData] = useState<{ coordinates: string; briefing: string } | null>(null);
   const [showLifeline, setShowLifeline] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [showClueSupport, setShowClueSupport] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 768);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,7 +43,7 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
       onCodeSubmit(inputCode);
       setInputCode('');
       setShowLifeline(false);
-      setLifelineText('');
+      setLifelineData(null);
     }
   };
 
@@ -41,7 +51,7 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
     const wasUsed = onUseLifeline();
     if (wasUsed) {
       const lifeline = getLifelineText(currentCheckpoint);
-      setLifelineText(lifeline);
+      setLifelineData(lifeline);
       setShowLifeline(true);
     }
   };
@@ -50,8 +60,32 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
     setShowClueSupport(true);
   };
 
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      // Brief feedback
+      const feedback = document.createElement('div');
+      feedback.textContent = 'COORDINATES COPIED';
+      feedback.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 255, 0, 0.2);
+        color: #00ff00;
+        padding: 5px 10px;
+        font-family: monospace;
+        font-size: 12px;
+        border: 1px solid #00ff00;
+        z-index: 1000;
+      `;
+      document.body.appendChild(feedback);
+      setTimeout(() => feedback.remove(), 1500);
+    });
+  };
+
   const clueText = getClueText(currentCheckpoint);
   const isSecondToLast = currentCheckpoint === totalCheckpoints - 2;
+  const isCheckpoint4 = currentCheckpoint === 3;
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
@@ -67,7 +101,7 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
         </div>
 
         {/* Desktop Hint for Checkpoint 4 Only */}
-        {currentCheckpoint === 3 && (
+        {isCheckpoint4 && isDesktop && (
           <div className="desktop-hint">
             <div className="text-xs font-bold mb-1">DESKTOP ACCESS GRANTED</div>
             <div className="text-xs">PASSWORD: SCI SPY</div>
@@ -122,6 +156,46 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
           </div>
         )}
 
+        {/* Lifeline Popup */}
+        {showLifeline && lifelineData && (
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+            <div className="bg-black border border-red-500 p-6 max-w-sm w-full">
+              <div className="text-red-400 font-bold mb-4 text-center">
+                🔴 LIFELINE ACTIVATED 🔴
+              </div>
+              <div className="text-red-300 text-sm font-bold mb-2">
+                Agent Support Deployed
+              </div>
+              
+              <div className="mb-4">
+                <div className="text-yellow-300 text-xs font-bold mb-1">Coordinates:</div>
+                <div 
+                  className="bg-gray-900 border border-yellow-400 p-2 text-yellow-200 text-xs font-mono select-all cursor-pointer"
+                  onClick={() => copyToClipboard(lifelineData.coordinates)}
+                  title="Click to copy coordinates"
+                >
+                  {lifelineData.coordinates}
+                </div>
+                <div className="text-xs text-yellow-600 mt-1">Click to copy coordinates</div>
+              </div>
+
+              <div className="mb-4">
+                <div className="text-green-300 text-xs font-bold mb-1">Mission Briefing:</div>
+                <div className="text-green-200 text-xs leading-relaxed">
+                  {lifelineData.briefing}
+                </div>
+              </div>
+
+              <button
+                onClick={() => setShowLifeline(false)}
+                className="w-full bg-red-600 hover:bg-red-500 text-black font-bold py-2 px-4 transition-colors"
+              >
+                [CLOSE LIFELINE]
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Progress Indicator */}
         <div className="text-center text-green-300">
           <div className="text-sm font-bold">
@@ -138,42 +212,55 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
             {isSecondToLast ? "FINAL TRANSMISSION" : "ENCRYPTED MESSAGE"}
           </div>
           
-          <div className="text-xs leading-relaxed whitespace-pre-line">
-            {clueText}
-          </div>
+          {isCheckpoint4 && !isDesktop ? (
+            <div className="text-center text-yellow-400">
+              <div className="text-lg mb-4">🖥️</div>
+              <div className="text-sm font-bold mb-2">DESKTOP ACCESS REQUIRED</div>
+              <div className="text-xs leading-relaxed">
+                This checkpoint requires a larger screen for security protocols. 
+                Access from a desktop or tablet device to continue your mission.
+              </div>
+            </div>
+          ) : (
+            <div className="text-xs leading-relaxed whitespace-pre-line">
+              {clueText}
+            </div>
+          )}
         </div>
 
         {/* Code Input */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="border border-green-400 p-4 bg-black/90">
-            <label className="block text-xs font-bold mb-2 text-green-300">
-              ENTER CODE:
-            </label>
-            <input
-              type="text"
-              value={inputCode}
-              onChange={(e) => setInputCode(e.target.value.toUpperCase())}
-              className="w-full bg-black border border-green-600 text-green-400 px-3 py-2 text-sm font-mono focus:outline-none focus:border-green-300"
-              placeholder="TYPE CODE HERE..."
-              maxLength={20}
-            />
-          </div>
-          
-          <button
-            type="submit"
-            className="w-full bg-green-600 hover:bg-green-500 text-black font-bold py-3 px-4 transition-colors duration-200 border border-green-400 disabled:opacity-50"
-            disabled={!inputCode.trim()}
-          >
-            [SUBMIT CODE]
-          </button>
-        </form>
+        {(!isCheckpoint4 || isDesktop) && (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="border border-green-400 p-4 bg-black/90">
+              <label className="block text-xs font-bold mb-2 text-green-300">
+                ENTER CODE:
+              </label>
+              <input
+                type="text"
+                value={inputCode}
+                onChange={(e) => setInputCode(e.target.value.toUpperCase())}
+                className="w-full bg-black border border-green-600 text-green-400 px-3 py-2 text-sm font-mono focus:outline-none focus:border-green-300"
+                placeholder="TYPE CODE HERE..."
+                maxLength={20}
+              />
+            </div>
+            
+            <button
+              type="submit"
+              className="w-full bg-green-600 hover:bg-green-500 text-black font-bold py-3 px-4 transition-colors duration-200 border border-green-400 disabled:opacity-50"
+              disabled={!inputCode.trim()}
+            >
+              [SUBMIT CODE]
+            </button>
+          </form>
+        )}
 
         {/* Lifeline Button */}
         <button
           onClick={handleLifelineClick}
           className={`w-full py-2 px-4 border text-sm transition-colors duration-200 ${
             lifelinesRemaining > 0
-              ? 'border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black'
+              ? 'border-red-400 text-red-400 hover:bg-red-400 hover:text-black'
               : 'border-gray-600 text-gray-600 cursor-not-allowed'
           }`}
           disabled={lifelinesRemaining === 0}
@@ -188,18 +275,6 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
         >
           [CLUE MISSING?]
         </button>
-
-        {/* Persistent Lifeline Display */}
-        {showLifeline && lifelineText && (
-          <div className="border border-yellow-400 bg-yellow-900/20 p-4">
-            <div className="text-yellow-300 text-sm font-bold mb-2 text-center">
-              LIFELINE ACTIVATED
-            </div>
-            <div className="text-yellow-200 text-xs leading-relaxed">
-              {lifelineText}
-            </div>
-          </div>
-        )}
 
         {/* Status Messages */}
         {showError && (

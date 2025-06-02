@@ -11,8 +11,6 @@ const MysteriousLanding: React.FC<MysteriousLandingProps> = ({ onProceed }) => {
 
   const messages = [
     "SECURE CONNECTION ESTABLISHED...",
-    "DECRYPTING TRANSMISSION...",
-    "IDENTITY CONFIRMED: AGENT CLEARANCE",
     "MISSION PARAMETERS LOADING..."
   ];
 
@@ -24,7 +22,7 @@ const MysteriousLanding: React.FC<MysteriousLandingProps> = ({ onProceed }) => {
         clearInterval(messageInterval);
         setTimeout(() => setShowButton(true), 2000);
       }
-    }, 4000);
+    }, 2500);
 
     return () => clearInterval(messageInterval);
   }, [currentMessage, messages.length]);
@@ -46,7 +44,7 @@ const MysteriousLanding: React.FC<MysteriousLandingProps> = ({ onProceed }) => {
           key={currentMessage}
           className="typewriter mb-8"
           style={{
-            animation: 'typing 3s steps(40, end), blink-caret .75s step-end infinite'
+            animation: 'typing 2s steps(40, end), blink-caret .75s step-end infinite'
           }}
         >
           {messages[currentMessage]}
