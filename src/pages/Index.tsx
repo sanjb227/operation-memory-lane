@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import WelcomeScreen from '../components/WelcomeScreen';
 import MissionBriefing from '../components/MissionBriefing';
@@ -7,6 +8,8 @@ import PreFinalCheckpointModal from '../components/PreFinalCheckpointModal';
 import MissionAccomplished from '../components/MissionAccomplished';
 import MysteriousLanding from '../components/MysteriousLanding';
 import SystemMessages from '../components/SystemMessages';
+import CheckpointTimer from '../components/CheckpointTimer';
+import MissionTimer from '../components/MissionTimer';
 import { GamePhase } from '../types/game';
 import { useGameProgress } from '../hooks/useGameProgress';
 
@@ -32,6 +35,10 @@ const Index = () => {
   const [showPreFinalModal, setShowPreFinalModal] = useState(false);
   const [progressLoaded, setProgressLoaded] = useState(false);
   const [showMysteriousLanding, setShowMysteriousLanding] = useState(true);
+  
+  // Timer state
+  const [sessionStartTime, setSessionStartTime] = useState<number | null>(null);
+  const [checkpointTimes, setCheckpointTimes] = useState<number[]>([]);
 
   const { sessionId, isLoading, saveProgress, loadProgress } = useGameProgress();
 
@@ -126,6 +133,9 @@ const Index = () => {
     console.log('Setting phase to briefing...');
     setCurrentPhase('briefing');
     
+    // Initialize session start time
+    setSessionStartTime(Date.now());
+    
     if (sessionId && progressLoaded) {
       saveProgress(0, 3, []);
     }
@@ -139,6 +149,17 @@ const Index = () => {
   const handleBackToWelcome = () => {
     console.log('BACK TO WELCOME clicked - returning to welcome screen');
     setCurrentPhase('welcome');
+  };
+
+  const handleCheckpointTimeUpdate = (seconds: number) => {
+    console.log(`Checkpoint ${currentCheckpoint + 1} time: ${seconds}s`);
+  };
+
+  const handleCheckpointComplete = (finalTime: number) => {
+    console.log(`Checkpoint ${currentCheckpoint + 1} completed in ${finalTime}s`);
+    const newTimes = [...checkpointTimes];
+    newTimes[currentCheckpoint] = finalTime;
+    setCheckpointTimes(newTimes);
   };
 
   const handleCodeSubmit = (code: string) => {
@@ -248,11 +269,21 @@ const Index = () => {
       {/* System Messages Component */}
       <SystemMessages />
 
-      {/* Mission Timer */}
-      <div className="fixed bottom-4 left-4 text-green-400 text-xs font-mono opacity-60 z-10">
-        <div>MISSION TIMER: {Math.floor(Date.now() / 1000) % 86400} SEC</div>
-        <div>LOCATION: CLASSIFIED</div>
-      </div>
+      {/* Checkpoint Timer - only show during clue phase */}
+      {currentPhase === 'clue' && (
+        <CheckpointTimer
+          checkpointNumber={currentCheckpoint + 1}
+          isActive={currentPhase === 'clue'}
+          onTimeUpdate={handleCheckpointTimeUpdate}
+          onComplete={handleCheckpointComplete}
+        />
+      )}
+
+      {/* Mission Timer - replaces the old fixed timer */}
+      <MissionTimer 
+        sessionStartTime={sessionStartTime} 
+        currentCheckpoint={currentCheckpoint + 1} 
+      />
 
       {/* Checkpoint 7 Handler Modal */}
       {showCheckpoint7Handler && (

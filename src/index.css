@@ -129,7 +129,7 @@
     box-sizing: border-box;
     /* iPhone X Safe Area */
     padding-top: max(15px, env(safe-area-inset-top));
-    padding-bottom: max(15px, env(safe-area-inset-bottom));
+    padding-bottom: max(90px, env(safe-area-inset-bottom)); /* Increased bottom padding to prevent overlap */
 }
 
 .terminal-box {
@@ -147,8 +147,9 @@
     gap: 10px;
     justify-content: center;
     margin: 15px 0;
-    /* iPhone X Touch Target Optimization */
-    padding-bottom: max(15px, env(safe-area-inset-bottom));
+    /* iPhone X Touch Target Optimization - Increased bottom margin */
+    padding-bottom: max(80px, env(safe-area-inset-bottom));
+    margin-bottom: 80px; /* Extra space above bottom panel */
 }
 
 .button-row button {
@@ -193,8 +194,9 @@
     box-sizing: border-box;
     max-width: calc(100vw - 20px);
     overflow: visible;
-    /* iPhone X bottom safe area */
-    padding-bottom: max(25px, env(safe-area-inset-bottom));
+    /* iPhone X bottom safe area with extra space */
+    padding-bottom: max(100px, env(safe-area-inset-bottom));
+    margin-bottom: 80px; /* Space for mission timer */
 }
 
 .success-title {
@@ -242,6 +244,68 @@ h1, h2, h3, p, div {
     hyphens: auto;
 }
 
+/* Fixed position mission timer - preventing overlap */
+.mission-timer-display {
+    position: fixed;
+    bottom: max(10px, env(safe-area-inset-bottom));
+    left: max(15px, env(safe-area-inset-left));
+    right: max(15px, env(safe-area-inset-right));
+    background: rgba(0, 0, 0, 0.95);
+    border: 1px solid #00ff00;
+    padding: 8px 12px;
+    text-align: center;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    color: #00ff00;
+    z-index: 1000;
+    border-radius: 4px;
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Individual timer components */
+.checkpoint-timer-widget {
+    position: fixed;
+    top: max(20px, env(safe-area-inset-top));
+    right: max(15px, env(safe-area-inset-right));
+    background: rgba(0, 0, 0, 0.9);
+    border: 1px solid #00ff00;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    min-width: 90px;
+    z-index: 999;
+    font-family: 'Courier New', monospace;
+    color: #00ff00;
+}
+
+.timer-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+    opacity: 0.8;
+}
+
+.timer-display {
+    font-size: 16px;
+    font-weight: bold;
+    margin: 2px 0;
+    color: #00ff00;
+}
+
+.timer-par {
+    font-size: 9px;
+    opacity: 0.6;
+    margin-top: 2px;
+}
+
+/* Timer color states */
+.timer-excellent { color: #00ff00; }
+.timer-good { color: #ffaa00; }
+.timer-over-par { color: #ff4444; }
+
 /* iPhone X Specific Breakpoints */
 @media (max-width: 768px) {
     .agent-info-bar {
@@ -266,6 +330,11 @@ h1, h2, h3, p, div {
         padding: 8px 12px;
         min-height: 44px; /* iPhone X touch target */
     }
+
+    /* Ensure main content doesn't overlap with timer */
+    .min-h-screen {
+        padding-bottom: 80px !important;
+    }
 }
 
 /* iPhone X Portrait Mode (375px width) */
@@ -273,13 +342,16 @@ h1, h2, h3, p, div {
     .success-container {
         padding: 20px 15px;
         margin: 8px;
-        padding-bottom: max(20px, env(safe-area-inset-bottom));
+        padding-bottom: max(100px, env(safe-area-inset-bottom));
+        margin-bottom: 80px;
     }
     
     .button-row {
         flex-direction: column;
         align-items: center;
         gap: 12px;
+        margin-bottom: 100px; /* More space on small screens */
+        padding-bottom: max(100px, env(safe-area-inset-bottom));
     }
     
     .button-row button {
@@ -296,6 +368,22 @@ h1, h2, h3, p, div {
     
     input {
         font-size: 16px; /* Prevent zoom on iPhone X */
+    }
+
+    /* Checkpoint timer on mobile */
+    .checkpoint-timer-widget {
+        right: max(10px, env(safe-area-inset-right));
+        min-width: 80px;
+        padding: 8px;
+    }
+
+    .timer-display {
+        font-size: 14px;
+    }
+
+    .mission-timer-display {
+        font-size: 11px;
+        padding: 6px 10px;
     }
 }
 
@@ -320,6 +408,8 @@ h1, h2, h3, p, div {
     border-radius: 4px;
   }
 }
+
+/* ... keep existing code (force enable buttons styles) the same ... */
 
 /* FORCE ENABLE ALL BUTTONS with iPhone X Touch Optimization */
 button[disabled],
@@ -350,6 +440,8 @@ button[class*="text-gray"] {
     min-height: 44px !important;
     touch-action: manipulation !important;
 }
+
+/* ... keep existing code (animations and remaining styles) the same ... */
 
 /* Mission Completion Confetti Animation */
 @keyframes confetti-fall {
