@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { getClueText, getLifelineText } from '../utils/clueData';
 
@@ -36,7 +37,7 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Enhanced mobile detection for Checkpoint 3 (was previously Checkpoint 4)
+  // Enhanced mobile detection for Checkpoint 3 (Science Library)
   const isMobileDevice = () => {
     return (
       window.innerWidth < 1024 ||
@@ -119,7 +120,7 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
 
   const clueText = getClueText(currentCheckpoint);
   const isSecondToLast = currentCheckpoint === totalCheckpoints - 2;
-  const isCheckpoint3ScienceLibrary = currentCheckpoint === 2; // Now position 2 (0-indexed)
+  const isCheckpoint3ScienceLibrary = currentCheckpoint === 2; // Science Library at position 2 (0-indexed)
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
@@ -157,6 +158,7 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
                 <p>Inside the envelope, you'll find a password.</p>
                 <p>Enter the password on the site to unlock your next clue and discover your next location.</p>
                 <p>Repeat this process until you reach the final destination, where you'll find one last envelope and enter its password to complete the game and 'graduate.'</p>
+                <p className="text-yellow-400 font-bold">P.S. "A wise agent would keep all their envelopes with them."</p>
               </div>
               <button
                 onClick={() => setShowHelp(false)}

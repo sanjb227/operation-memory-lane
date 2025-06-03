@@ -23,7 +23,7 @@ const MysteriousLanding: React.FC<MysteriousLandingProps> = ({ onProceed }) => {
         // Show button after only 1 second for fast loading
         setTimeout(() => setShowButton(true), 1000);
       }
-    }, 1000); // Reduced to 1000ms for faster progression
+    }, 1500); // Slowed down to 1500ms for "SECURE CONNECTION ESTABLISHED"
 
     return () => clearInterval(messageInterval);
   }, [currentMessage, messages.length]);
