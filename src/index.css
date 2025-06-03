@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -99,18 +100,36 @@
   body {
     @apply bg-background text-foreground;
     margin: 0;
-    padding: 10px;
+    padding: 0;
     min-height: 100vh;
     overflow-x: hidden;
+    /* iPhone X Safe Area Support */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  /* iPhone X Safe Area Root Container */
+  #root {
+    min-height: 100vh;
+    padding: 10px;
+    padding-top: max(10px, env(safe-area-inset-top));
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
+    padding-left: max(10px, env(safe-area-inset-left));
+    padding-right: max(10px, env(safe-area-inset-right));
   }
 }
 
-/* Mobile-First Responsive Design Framework */
+/* iPhone X Optimized Mobile-First Responsive Design Framework */
 .page-container {
     max-width: 100vw;
     padding: 15px;
     margin: 0 auto;
     box-sizing: border-box;
+    /* iPhone X Safe Area */
+    padding-top: max(15px, env(safe-area-inset-top));
+    padding-bottom: max(15px, env(safe-area-inset-bottom));
 }
 
 .terminal-box {
@@ -125,139 +144,167 @@
 .button-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 10px;
     justify-content: center;
     margin: 15px 0;
+    /* iPhone X Touch Target Optimization */
+    padding-bottom: max(15px, env(safe-area-inset-bottom));
 }
 
 .button-row button {
     flex: 1;
-    min-width: 80px;
-    max-width: 120px;
-    padding: 8px 12px;
-    font-size: 12px;
+    min-width: 120px;
+    max-width: 160px;
+    padding: 12px 16px;
+    font-size: 14px;
+    /* iPhone X Touch Target - Minimum 44px height */
+    min-height: 44px;
+    /* Better touch interaction */
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
-/* Mission Header Mobile Fixes */
+/* Mission Header iPhone X Optimized */
 .mission-header {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    padding: 10px;
+    gap: 12px;
+    padding: 15px;
     flex-wrap: wrap;
     overflow: visible;
+    /* Safe area for iPhone X notch */
+    padding-top: max(15px, env(safe-area-inset-top));
 }
 
 .agent-info-bar {
-    font-size: 10px;
-    line-height: 1.2;
+    font-size: 11px;
+    line-height: 1.3;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    min-height: 15px;
+    min-height: 18px;
 }
 
-/* Success Page Mobile Fixes */
+/* Success Page iPhone X Optimized */
 .success-container {
-    padding: 20px 15px;
+    padding: 25px 20px;
     margin: 10px;
     box-sizing: border-box;
     max-width: calc(100vw - 20px);
     overflow: visible;
+    /* iPhone X bottom safe area */
+    padding-bottom: max(25px, env(safe-area-inset-bottom));
 }
 
 .success-title {
-    font-size: clamp(24px, 8vw, 48px);
-    line-height: 1.1;
-    margin-bottom: 20px;
+    font-size: clamp(28px, 8vw, 48px);
+    line-height: 1.2;
+    margin-bottom: 25px;
     word-wrap: break-word;
 }
 
 .success-message {
-    font-size: clamp(14px, 4vw, 18px);
-    line-height: 1.3;
-    margin: 15px 0;
+    font-size: clamp(16px, 4vw, 20px);
+    line-height: 1.4;
+    margin: 20px 0;
 }
 
-/* Audio Player Mobile Optimization */
+/* Audio Player iPhone X Optimization */
 .audio-container {
     width: 100%;
     max-width: 100%;
-    padding: 15px;
+    padding: 20px;
     box-sizing: border-box;
 }
 
 .audio-controls {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    gap: 8px;
-    margin: 15px 0;
+    gap: 12px;
+    margin: 20px 0;
 }
 
 .audio-progress-bar {
     width: 100%;
-    height: 8px;
-    margin: 10px 0;
+    height: 10px;
+    margin: 15px 0;
     cursor: pointer;
+    /* iPhone X Touch optimization */
     touch-action: manipulation;
+    -webkit-touch-callout: none;
 }
 
-/* Text Responsiveness */
+/* Text Responsiveness for iPhone X */
 h1, h2, h3, p, div {
     word-wrap: break-word;
     overflow-wrap: break-word;
     hyphens: auto;
 }
 
-/* Mobile Breakpoints */
+/* iPhone X Specific Breakpoints */
 @media (max-width: 768px) {
     .agent-info-bar {
-        font-size: 8px;
+        font-size: 10px;
         display: block;
         white-space: normal;
         word-wrap: break-word;
     }
     
     .mission-title {
-        font-size: 18px;
-        margin: 10px 0;
+        font-size: 20px;
+        margin: 15px 0;
     }
     
     .audio-controls {
         grid-template-columns: 1fr 1fr;
-        gap: 6px;
+        gap: 10px;
     }
     
     .audio-controls button {
-        font-size: 10px;
-        padding: 6px 8px;
+        font-size: 12px;
+        padding: 8px 12px;
+        min-height: 44px; /* iPhone X touch target */
     }
 }
 
+/* iPhone X Portrait Mode (375px width) */
 @media (max-width: 480px) {
     .success-container {
-        padding: 15px 10px;
-        margin: 5px;
+        padding: 20px 15px;
+        margin: 8px;
+        padding-bottom: max(20px, env(safe-area-inset-bottom));
     }
     
     .button-row {
         flex-direction: column;
         align-items: center;
+        gap: 12px;
     }
     
     .button-row button {
-        width: 80%;
-        max-width: 200px;
-        margin: 5px 0;
+        width: 85%;
+        max-width: 280px;
+        margin: 6px 0;
+        min-height: 48px; /* Slightly larger for iPhone X */
+    }
+
+    /* iPhone X text optimization */
+    body {
+        font-size: 16px; /* Prevent zoom on input focus */
+    }
+    
+    input {
+        font-size: 16px; /* Prevent zoom on iPhone X */
     }
 }
 
-/* Desktop hint for checkpoint 4 - Hidden on mobile, visible on desktop */
+/* Desktop hint for checkpoint 3 - Hidden on iPhone X, visible on desktop */
 .desktop-hint {
   display: none;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .desktop-hint {
     display: block;
     position: fixed;
@@ -265,16 +312,16 @@ h1, h2, h3, p, div {
     right: 20px;
     background: rgba(0, 0, 0, 0.9);
     color: #00ff00;
-    padding: 10px;
+    padding: 12px;
     border: 1px solid #00ff00;
     font-family: 'Courier New', monospace;
-    font-size: 12px;
+    font-size: 14px;
     z-index: 1000;
-    border-radius: 2px;
+    border-radius: 4px;
   }
 }
 
-/* FORCE ENABLE ALL BUTTONS */
+/* FORCE ENABLE ALL BUTTONS with iPhone X Touch Optimization */
 button[disabled],
 .btn-disabled,
 button:disabled,
@@ -285,9 +332,12 @@ button:disabled,
     background-color: #16a34a !important;
     color: #000 !important;
     border: 1px solid #22c55e !important;
+    /* iPhone X touch optimization */
+    min-height: 44px !important;
+    touch-action: manipulation !important;
 }
 
-/* Force enable audio control buttons specifically */
+/* Force enable audio control buttons specifically for iPhone X */
 .audio-control-btn,
 button[class*="border-gray"],
 button[class*="text-gray"] {
@@ -297,6 +347,8 @@ button[class*="text-gray"] {
     background-color: #16a34a !important;
     color: #000 !important;
     border: 1px solid #22c55e !important;
+    min-height: 44px !important;
+    touch-action: manipulation !important;
 }
 
 /* Mission Completion Confetti Animation */
@@ -358,11 +410,13 @@ button[class*="text-gray"] {
     color: #00ff00;
 }
 
-/* Agent button effects */
+/* Agent button effects with iPhone X optimization */
 .agent-button {
     transition: all 0.2s ease;
     position: relative;
     overflow: hidden;
+    min-height: 44px;
+    touch-action: manipulation;
 }
 
 .agent-button:hover {
@@ -389,11 +443,11 @@ button[class*="text-gray"] {
     left: 100%;
 }
 
-/* Scanline effect overlay */
+/* Scanline effect overlay - iPhone X safe area aware */
 body::before {
     content: '';
     position: fixed;
-    top: 0;
+    top: env(safe-area-inset-top);
     left: 0;
     width: 100%;
     height: 2px;
@@ -404,35 +458,39 @@ body::before {
     opacity: 0.3;
 }
 
-/* System message styling */
+/* System message styling with iPhone X safe area */
 .system-message {
     position: fixed;
-    top: 10px;
-    right: 10px;
+    top: max(10px, env(safe-area-inset-top));
+    right: max(10px, env(safe-area-inset-right));
     background: rgba(0, 255, 0, 0.1);
     border: 1px solid #00ff00;
     color: #00ff00;
-    padding: 5px 10px;
-    font-size: 12px;
+    padding: 8px 12px;
+    font-size: 14px;
     font-family: monospace;
     z-index: 1000;
     opacity: 0;
     transition: opacity 0.5s;
 }
 
-/* Enhanced progress bar for audio */
+/* Enhanced progress bar for audio with iPhone X touch */
 .audio-progress-container {
     background: rgba(0, 255, 0, 0.1);
     border: 1px solid #00ff00;
-    height: 6px;
+    height: 8px;
     cursor: pointer;
     position: relative;
     overflow: hidden;
+    touch-action: manipulation;
+    min-height: 44px; /* iPhone X touch target */
+    display: flex;
+    align-items: center;
 }
 
 .audio-progress-bar {
     background: #00ff00;
-    height: 100%;
+    height: 8px;
     transition: width 0.1s ease;
     box-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
 }
@@ -441,21 +499,26 @@ body::before {
     box-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
 }
 
-/* Speed control buttons */
+/* Speed control buttons with iPhone X optimization */
 .speed-control {
     display: flex;
-    gap: 2px;
-    margin-top: 8px;
+    gap: 4px;
+    margin-top: 12px;
 }
 
 .speed-btn {
     background: rgba(0, 255, 0, 0.1);
     border: 1px solid #00ff00;
     color: #00ff00;
-    padding: 2px 6px;
-    font-size: 10px;
+    padding: 6px 10px;
+    font-size: 12px;
     cursor: pointer;
     transition: all 0.2s;
+    min-height: 44px; /* iPhone X touch target */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: manipulation;
 }
 
 .speed-btn:hover {
@@ -468,11 +531,12 @@ body::before {
     color: black;
 }
 
-/* Mysterious Landing Page Styles */
+/* Mysterious Landing Page Styles with iPhone X optimization */
 .mysterious-container {
     text-align: center;
     width: 100%;
     max-width: 600px;
+    padding: 0 max(15px, env(safe-area-inset-left)) max(20px, env(safe-area-inset-bottom)) max(15px, env(safe-area-inset-right));
 }
 
 .typewriter {
@@ -482,7 +546,7 @@ body::before {
     letter-spacing: .1em;
     animation: typing 4s steps(40, end), blink-caret .75s step-end infinite;
     border-right: 3px solid #00ff00;
-    font-size: clamp(14px, 4vw, 24px);
+    font-size: clamp(16px, 4vw, 24px);
 }
 
 @keyframes typing {
@@ -504,16 +568,19 @@ body::before {
     to { opacity: 1; }
 }
 
+/* iPhone X optimized access button */
 .access-btn {
     background: transparent;
     border: 1px solid #00ff00;
     color: #00ff00;
-    padding: 12px 24px;
+    padding: 15px 30px;
     font-family: monospace;
     cursor: pointer;
     margin-top: 30px;
     transition: all 0.3s;
-    min-height: 44px;
+    min-height: 48px; /* Larger for iPhone X */
+    touch-action: manipulation;
+    font-size: 16px; /* Prevent zoom on iPhone X */
 }
 
 .access-btn:hover {
@@ -521,17 +588,19 @@ body::before {
     box-shadow: 0 0 10px #00ff00;
 }
 
+/* iPhone X optimized start over button */
 .start-over-btn {
     background: rgba(0, 255, 0, 0.2) !important;
     border: 1px solid #00ff00 !important;
     color: #00ff00 !important;
-    padding: 8px 16px !important;
+    padding: 12px 20px !important;
     font-family: monospace !important;
-    font-size: 12px !important;
+    font-size: 14px !important;
     cursor: pointer !important;
-    margin-top: 20px !important;
+    margin-top: 25px !important;
     transition: all 0.2s !important;
-    min-height: 44px !important;
+    min-height: 48px !important; /* iPhone X touch target */
+    touch-action: manipulation !important;
 }
 
 .start-over-btn:hover {
@@ -548,4 +617,46 @@ body::before {
     0% { opacity: 1; }
     50% { opacity: 0; }
     100% { opacity: 1; }
+}
+
+/* iPhone X Specific Input Optimizations */
+input[type="text"], input[type="password"], textarea {
+    font-size: 16px !important; /* Prevent zoom on iPhone X */
+    -webkit-appearance: none;
+    -webkit-border-radius: 0;
+    border-radius: 0;
+    /* iOS Safari input optimization */
+    -webkit-user-select: text;
+    user-select: text;
+    /* Prevent callouts on long press */
+    -webkit-touch-callout: default;
+}
+
+/* iPhone X Copy-Paste Optimization for Coordinates */
+.coordinate-text {
+    user-select: all;
+    -webkit-user-select: all;
+    -webkit-touch-callout: default;
+    cursor: pointer;
+    padding: 4px;
+}
+
+/* iPhone X Portrait Lock Support */
+@media screen and (orientation: landscape) and (max-height: 480px) {
+    .landscape-warning {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        color: #00ff00;
+        font-family: monospace;
+        text-align: center;
+        padding: 20px;
+    }
 }
