@@ -9,33 +9,135 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      checkpoint_timing: {
+        Row: {
+          checkpoint_number: number
+          created_at: string | null
+          duration_seconds: number | null
+          end_time: string | null
+          id: string
+          invalid_attempt_penalty: number | null
+          invalid_attempts_count: number | null
+          lifeline_penalty: number | null
+          lifelines_used_count: number | null
+          net_score: number | null
+          session_id: string
+          start_time: string | null
+          time_score: number | null
+        }
+        Insert: {
+          checkpoint_number: number
+          created_at?: string | null
+          duration_seconds?: number | null
+          end_time?: string | null
+          id?: string
+          invalid_attempt_penalty?: number | null
+          invalid_attempts_count?: number | null
+          lifeline_penalty?: number | null
+          lifelines_used_count?: number | null
+          net_score?: number | null
+          session_id: string
+          start_time?: string | null
+          time_score?: number | null
+        }
+        Update: {
+          checkpoint_number?: number
+          created_at?: string | null
+          duration_seconds?: number | null
+          end_time?: string | null
+          id?: string
+          invalid_attempt_penalty?: number | null
+          invalid_attempts_count?: number | null
+          lifeline_penalty?: number | null
+          lifelines_used_count?: number | null
+          net_score?: number | null
+          session_id?: string
+          start_time?: string | null
+          time_score?: number | null
+        }
+        Relationships: []
+      }
       game_progress: {
         Row: {
+          checkpoint_duration_seconds: number | null
+          checkpoint_end_time: string | null
+          checkpoint_score: number | null
+          checkpoint_start_time: string | null
           completed_checkpoints: string[] | null
           created_at: string | null
           current_checkpoint: number | null
+          game_completed: boolean | null
           id: string
+          invalid_attempt_penalty: number | null
+          invalid_attempts_count: number | null
           lifelines_remaining: number | null
+          mission_start_time: string | null
           session_id: string
+          total_mission_time_seconds: number | null
           updated_at: string | null
         }
         Insert: {
+          checkpoint_duration_seconds?: number | null
+          checkpoint_end_time?: string | null
+          checkpoint_score?: number | null
+          checkpoint_start_time?: string | null
           completed_checkpoints?: string[] | null
           created_at?: string | null
           current_checkpoint?: number | null
+          game_completed?: boolean | null
           id?: string
+          invalid_attempt_penalty?: number | null
+          invalid_attempts_count?: number | null
           lifelines_remaining?: number | null
+          mission_start_time?: string | null
           session_id: string
+          total_mission_time_seconds?: number | null
           updated_at?: string | null
         }
         Update: {
+          checkpoint_duration_seconds?: number | null
+          checkpoint_end_time?: string | null
+          checkpoint_score?: number | null
+          checkpoint_start_time?: string | null
           completed_checkpoints?: string[] | null
           created_at?: string | null
           current_checkpoint?: number | null
+          game_completed?: boolean | null
           id?: string
+          invalid_attempt_penalty?: number | null
+          invalid_attempts_count?: number | null
           lifelines_remaining?: number | null
+          mission_start_time?: string | null
           session_id?: string
+          total_mission_time_seconds?: number | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      invalid_attempts: {
+        Row: {
+          attempt_time: string | null
+          attempted_code: string
+          checkpoint_number: number
+          id: string
+          penalty_applied: number | null
+          session_id: string
+        }
+        Insert: {
+          attempt_time?: string | null
+          attempted_code: string
+          checkpoint_number: number
+          id?: string
+          penalty_applied?: number | null
+          session_id: string
+        }
+        Update: {
+          attempt_time?: string | null
+          attempted_code?: string
+          checkpoint_number?: number
+          id?: string
+          penalty_applied?: number | null
+          session_id?: string
         }
         Relationships: []
       }
