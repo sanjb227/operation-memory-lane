@@ -15,15 +15,16 @@ import AutoFadeNotification, { useNotifications } from '../components/AutoFadeNo
 import { GamePhase } from '../types/game';
 import { useGameState } from '../hooks/useGameState';
 
+// CORRECTED ANSWER CODES FOR TREASURE HUNT
 const correctCodes = [
-  "BAGGAGE CLAIMED",  // Checkpoint 1
-  "STAIRWAY SPY",     // Checkpoint 2
-  "READ BETWEEN",     // Checkpoint 3
-  "TAP SECRET",       // Checkpoint 4
-  "SCI SPY",          // Checkpoint 5 - now allowed on mobile
-  "BUDDING GENIUS",   // Checkpoint 6
-  "MUFFIN MISSION",   // Checkpoint 7
-  "ARMCHAIR AGENT"    // Checkpoint 8
+  "BAGGAGE CLAIMED",  // Checkpoint 1 (was ODF)
+  "STAIRWAY SPY",     // Checkpoint 2 (was PLAQUE)
+  "READ BETWEEN",     // Checkpoint 3 (was LOGIN)
+  "TAP SECRET",       // Checkpoint 4 (was CIRCUIT)
+  "SCI SPY",          // Checkpoint 5 - works on mobile AND desktop
+  "BUDDING GENIUS",   // Checkpoint 6 (was TELESCOPE)
+  "MUFFIN MISSION",   // Checkpoint 7 (was GRADUATE)
+  "ARMCHAIR AGENT"    // Checkpoint 8 (was VICTORY)
 ];
 
 const Index = () => {
@@ -213,7 +214,6 @@ const Index = () => {
     resumeGame();
     setLifelinesRemaining(3 - gameState.totalLifelinesUsed);
     setCurrentPhase('clue');
-    // Don't add the persistent "Game resumed" notification
   };
 
   const handleStartNewGameFromRecovery = () => {
@@ -263,7 +263,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-black text-green-400 font-mono overflow-hidden">
-      {/* Notification System */}
+      {/* Notification System - Auto-fading, properly spaced */}
       <AutoFadeNotification 
         notifications={notifications} 
         onRemove={removeNotification} 

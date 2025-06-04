@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { getClueText, getLifelineText } from '../utils/clueData';
 
@@ -97,8 +98,8 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 pt-20">
-      {/* Desktop Code Display for Checkpoint 5 */}
-      {(currentCheckpoint + 1) === 5 && isDesktop && (
+      {/* Desktop Code Display for Checkpoint 5 - CRITICAL FEATURE */}
+      {currentCheckpoint === 4 && isDesktop && (
         <div 
           className="fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg font-mono text-lg border border-green-400 z-50"
           style={{ 
