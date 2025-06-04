@@ -16,44 +16,31 @@ body {
   overflow-x: hidden;
 }
 
-/* Score Header Styles */
-.score-header {
+/* Score Display Styles */
+.score-display {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  background: rgba(0, 0, 0, 0.95);
-  border-bottom: 1px solid #4ade80;
-  padding: 0.75rem;
-  z-index: 40;
-  font-family: 'JetBrains Mono', monospace;
-}
-
-.score-container {
-  max-width: 1024px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.current-score {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.score-label {
-  color: #86efac;
-  font-weight: bold;
-  font-size: 0.875rem;
-}
-
-.score-value {
+  top: 1rem;
+  right: 5rem;
   color: #4ade80;
-  font-weight: bold;
-  font-size: 1.125rem;
+  font-size: 0.875rem;
   font-family: 'JetBrains Mono', monospace;
+  z-index: 50;
+}
+
+/* Terminal Notification Styles */
+.terminal-notification {
+  border: 1px solid;
+  padding: 8px 16px;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  border-radius: 4px;
+  margin-top: 8px;
+  transition: all 0.3s ease;
+}
+
+.terminal-notification.show {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* Enhanced Score Popup Styles */
@@ -83,29 +70,24 @@ body {
   margin: 0 1rem;
 }
 
-/* Invalid Attempt Popup Styles */
-.invalid-attempt-popup {
-  position: fixed;
-  top: 6rem;
-  right: 1rem;
-  z-index: 50;
-  background: rgba(239, 68, 68, 0.95);
-  border: 2px solid #ef4444;
-  color: #fef2f2;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  animation: slideInRight 0.3s ease-out;
+/* Scoring Table Styles */
+.scoring-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Courier New', monospace;
+  color: #00ff00;
+  margin-top: 20px;
 }
 
-@keyframes slideInRight {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
+.scoring-table th, .scoring-table td {
+  border: 1px solid #00ff00;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.scoring-table th {
+  background: rgba(0, 255, 0, 0.1);
+  font-weight: bold;
 }
 
 /* Timer Display Styles */
@@ -129,7 +111,7 @@ input[type="text"], input[type="password"] {
   border: 2px solid #16a34a !important;
   padding: 0.75rem !important;
   font-family: 'JetBrains Mono', monospace !important;
-  font-size: 16px !important; /* Prevents iOS zoom */
+  font-size: 16px !important;
   outline: none !important;
   transition: all 0.2s ease !important;
 }
@@ -223,17 +205,14 @@ button:active {
 
 /* Mobile Optimizations */
 @media (max-width: 768px) {
-  .score-header {
-    padding: 0.5rem;
+  .score-display {
+    top: 0.5rem;
+    right: 0.5rem;
   }
   
-  .score-container {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  
-  .current-score {
-    gap: 0.5rem;
+  .timer-display {
+    top: 0.5rem;
+    right: 0.5rem;
   }
   
   .score-popup {
@@ -243,19 +222,13 @@ button:active {
     transform: none;
     width: auto;
   }
-  
-  .timer-display {
-    top: 0.5rem;
-    right: 0.5rem;
-  }
 }
 
 /* iPhone X and newer safe area support */
 @supports (padding: max(0px)) {
-  .score-header {
-    padding-left: max(0.75rem, env(safe-area-inset-left));
-    padding-right: max(0.75rem, env(safe-area-inset-right));
-    padding-top: max(0.75rem, env(safe-area-inset-top));
+  .score-display {
+    top: max(1rem, env(safe-area-inset-top));
+    right: max(5rem, env(safe-area-inset-right) + 4rem);
   }
   
   .timer-display {
@@ -300,11 +273,6 @@ button:active {
 
 /* High contrast mode support */
 @media (prefers-contrast: high) {
-  .score-header {
-    background: #000;
-    border-bottom: 2px solid #4ade80;
-  }
-  
   input[type="text"], input[type="password"] {
     border-width: 3px !important;
   }
