@@ -1,826 +1,334 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap");
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
+/* Global Styles */
+body {
+  margin: 0;
+  font-family: 'JetBrains Mono', monospace;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #000;
+  color: #4ade80;
+  overflow-x: hidden;
 }
 
-@layer base {
-  * {
-    @apply border-border;
-    box-sizing: border-box;
-  }
+/* Score Header Styles */
+.score-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.95);
+  border-bottom: 1px solid #4ade80;
+  padding: 0.75rem;
+  z-index: 40;
+  font-family: 'JetBrains Mono', monospace;
+}
 
-  body {
-    @apply bg-background text-foreground;
-    margin: 0;
-    padding: 0;
-    min-height: 100vh;
-    overflow-x: hidden;
-    /* iPhone X Safe Area Support */
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
-  }
+.score-container {
+  max-width: 1024px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 
-  /* iPhone X Safe Area Root Container */
-  #root {
-    min-height: 100vh;
-    padding: 10px;
-    padding-top: max(10px, env(safe-area-inset-top));
-    padding-bottom: max(10px, env(safe-area-inset-bottom));
-    padding-left: max(10px, env(safe-area-inset-left));
-    padding-right: max(10px, env(safe-area-inset-right));
+.current-score {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.score-label {
+  color: #86efac;
+  font-weight: bold;
+  font-size: 0.875rem;
+}
+
+.score-value {
+  color: #4ade80;
+  font-weight: bold;
+  font-size: 1.125rem;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Enhanced Score Popup Styles */
+.score-popup {
+  position: fixed;
+  top: 6rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  transition: all 0.5s ease;
+  opacity: 0;
+  transform: translateX(-50%) translateY(-1rem);
+}
+
+.score-popup.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.score-popup-content {
+  background: rgba(0, 0, 0, 0.95);
+  border: 2px solid #4ade80;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  max-width: 24rem;
+  width: 100%;
+  margin: 0 1rem;
+}
+
+/* Invalid Attempt Popup Styles */
+.invalid-attempt-popup {
+  position: fixed;
+  top: 6rem;
+  right: 1rem;
+  z-index: 50;
+  background: rgba(239, 68, 68, 0.95);
+  border: 2px solid #ef4444;
+  color: #fef2f2;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
   }
 }
 
-/* iPhone X Optimized Mobile-First Responsive Design Framework */
-.page-container {
-    max-width: 100vw;
-    padding: 20px;
-    margin: 0 auto;
-    box-sizing: border-box;
-    /* iPhone X Safe Area with increased spacing */
-    padding-top: max(20px, env(safe-area-inset-top));
-    padding-bottom: max(80px, env(safe-area-inset-bottom)); /* Increased bottom padding */
+/* Timer Display Styles */
+.timer-display {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  color: #4ade80;
+  font-size: 0.875rem;
+  font-family: 'JetBrains Mono', monospace;
+  z-index: 50;
 }
 
-.terminal-box {
-    border: 1px solid #00ff00;
-    padding: 20px;
-    margin: 15px 0;
-    background: rgba(0, 0, 0, 0.8);
-    max-width: 100%;
-    overflow: visible;
+/* Input Field Enhancements */
+input[type="text"], input[type="password"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-color: #000 !important;
+  color: #4ade80 !important;
+  border: 2px solid #16a34a !important;
+  padding: 0.75rem !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 16px !important; /* Prevents iOS zoom */
+  outline: none !important;
+  transition: all 0.2s ease !important;
 }
 
-.button-row {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    justify-content: center;
-    margin: 20px 0;
-    /* iPhone X Touch Target Optimization with increased spacing */
-    padding-bottom: max(20px, env(safe-area-inset-bottom));
+input[type="text"]:focus, input[type="password"]:focus {
+  border-color: #86efac !important;
+  box-shadow: 0 0 0 2px rgba(134, 239, 172, 0.2) !important;
+  background-color: #000 !important;
+  color: #4ade80 !important;
 }
 
-.button-row button {
-    width: 100%;
-    padding: 15px 20px;
-    font-size: 16px;
-    /* iPhone X Touch Target - Minimum 44px height */
-    min-height: 52px;
-    /* Better touch interaction */
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    user-select: none;
-    margin-bottom: 10px;
+input[type="text"]:disabled, input[type="password"]:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
 }
 
-/* Mission Header iPhone X Optimized */
-.mission-header {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    padding: 20px;
-    flex-wrap: wrap;
-    overflow: visible;
-    /* Safe area for iPhone X notch */
-    padding-top: max(20px, env(safe-area-inset-top));
+/* Button Enhancements */
+button {
+  font-family: 'JetBrains Mono', monospace;
+  transition: all 0.2s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.agent-info-bar {
-    font-size: 12px;
-    line-height: 1.4;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    min-height: 20px;
+button:active {
+  transform: scale(0.98);
 }
 
-/* Success Page iPhone X Optimized */
-.success-container {
-    padding: 30px 25px;
-    margin: 15px;
-    box-sizing: border-box;
-    max-width: calc(100vw - 30px);
-    overflow: visible;
-    /* iPhone X bottom safe area with increased spacing */
-    padding-bottom: max(30px, env(safe-area-inset-bottom));
+/* Terminal Effects */
+.terminal-glow {
+  box-shadow: 
+    0 0 10px rgba(74, 222, 128, 0.3),
+    inset 0 0 10px rgba(74, 222, 128, 0.1);
 }
 
-.success-title {
-    font-size: clamp(32px, 8vw, 52px);
-    line-height: 1.2;
-    margin-bottom: 30px;
-    word-wrap: break-word;
-}
-
-.success-message {
-    font-size: clamp(18px, 4vw, 22px);
-    line-height: 1.5;
-    margin: 25px 0;
-}
-
-/* Audio Player iPhone X Optimization */
-.audio-container {
-    width: 100%;
-    max-width: 100%;
-    padding: 25px;
-    box-sizing: border-box;
-}
-
-.audio-controls {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 15px;
-    margin: 25px 0;
-}
-
-.audio-progress-bar {
-    width: 100%;
-    height: 12px;
-    margin: 18px 0;
-    cursor: pointer;
-    /* iPhone X Touch optimization */
-    touch-action: manipulation;
-    -webkit-touch-callout: none;
-}
-
-/* Text Responsiveness for iPhone X */
-h1, h2, h3, p, div {
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    hyphens: auto;
-}
-
-/* iPhone X Specific Breakpoints */
-@media (max-width: 768px) {
-    .agent-info-bar {
-        font-size: 11px;
-        display: block;
-        white-space: normal;
-        word-wrap: break-word;
-    }
-    
-    .mission-title {
-        font-size: 22px;
-        margin: 18px 0;
-    }
-    
-    .audio-controls {
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-    }
-    
-    .audio-controls button {
-        font-size: 14px;
-        padding: 10px 15px;
-        min-height: 48px; /* iPhone X touch target */
-    }
-}
-
-/* iPhone X Portrait Mode (375px width) with improved spacing */
-@media (max-width: 480px) {
-    .success-container {
-        padding: 25px 20px;
-        margin: 10px;
-        padding-bottom: max(25px, env(safe-area-inset-bottom));
-    }
-    
-    .button-row {
-        flex-direction: column;
-        align-items: center;
-        gap: 15px;
-    }
-    
-    .button-row button {
-        width: 100%;
-        max-width: 100%;
-        margin: 8px 0;
-        min-height: 52px; /* Larger for iPhone X */
-    }
-
-    /* iPhone X text optimization */
-    body {
-        font-size: 16px; /* Prevent zoom on input focus */
-    }
-    
-    input {
-        font-size: 16px; /* Prevent zoom on iPhone X */
-    }
-    
-    /* Increased spacing for mobile content */
-    .page-container {
-        padding: 25px 20px;
-        padding-bottom: max(100px, env(safe-area-inset-bottom));
-    }
-}
-
-/* Desktop hint for checkpoint 5 - Hidden on iPhone X, visible on desktop */
-.desktop-hint {
-  display: none;
-}
-
-@media (min-width: 1024px) {
-  .desktop-hint {
-    display: block;
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: rgba(0, 0, 0, 0.9);
-    color: #00ff00;
-    padding: 12px;
-    border: 1px solid #00ff00;
-    font-family: 'Courier New', monospace;
-    font-size: 14px;
-    z-index: 1000;
-    border-radius: 4px;
-  }
-}
-
-/* FORCE ENABLE ALL BUTTONS with iPhone X Touch Optimization */
-button[disabled],
-.btn-disabled,
-button:disabled,
-[disabled] {
-    opacity: 1 !important;
-    pointer-events: auto !important;
-    cursor: pointer !important;
-    background-color: #16a34a !important;
-    color: #000 !important;
-    border: 1px solid #22c55e !important;
-    /* iPhone X touch optimization */
-    min-height: 48px !important;
-    touch-action: manipulation !important;
-}
-
-/* Force enable audio control buttons specifically for iPhone X */
-.audio-control-btn,
-button[class*="border-gray"],
-button[class*="text-gray"] {
-    opacity: 1 !important;
-    pointer-events: auto !important;
-    cursor: pointer !important;
-    background-color: #16a34a !important;
-    color: #000 !important;
-    border: 1px solid #22c55e !important;
-    min-height: 48px !important;
-    touch-action: manipulation !important;
-}
-
-/* Mission Completion Confetti Animation */
-@keyframes confetti-fall {
-    to {
-        transform: translateY(100vh) rotate(720deg);
-        opacity: 0;
-    }
-}
-
-/* Terminal Immersion Effects */
-@keyframes typewriter {
-    from { width: 0; }
-    to { width: 100%; }
-}
-
-@keyframes flicker {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.8; }
-}
-
-@keyframes glow {
-    from { text-shadow: 0 0 5px #00ff00; }
-    to { text-shadow: 0 0 20px #00ff00, 0 0 30px #00ff00; }
-}
-
-@keyframes scanline {
-    0% { transform: translateY(-100%); }
-    100% { transform: translateY(100vh); }
-}
-
-@keyframes cursor-blink {
-    0%, 50% { opacity: 1; }
-    51%, 100% { opacity: 0; }
-}
-
-/* Terminal styling classes */
 .terminal-text {
-    overflow: hidden;
-    white-space: nowrap;
-    animation: typewriter 2s steps(40, end);
-}
-
-.screen-flicker {
-    animation: flicker 0.1s infinite alternate;
+  text-shadow: 0 0 5px rgba(74, 222, 128, 0.5);
 }
 
 .glow-text {
-    animation: glow 1s ease-in-out infinite alternate;
+  text-shadow: 
+    0 0 5px currentColor,
+    0 0 10px currentColor,
+    0 0 15px currentColor;
 }
 
-.terminal-glow {
-    box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
-}
-
-.cursor::after {
-    content: '_';
-    animation: cursor-blink 1s infinite;
-    color: #00ff00;
-}
-
-/* Agent button effects with iPhone X optimization */
-.agent-button {
-    transition: all 0.2s ease;
-    position: relative;
-    overflow: hidden;
-    min-height: 48px;
-    touch-action: manipulation;
-}
-
-.agent-button:hover {
-    box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
-    transform: translateY(-1px);
-}
-
-.agent-button:active {
+/* Animation Enhancements */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(2rem);
+  }
+  to {
+    opacity: 1;
     transform: translateY(0);
+  }
 }
 
-.agent-button::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(0, 255, 0, 0.3), transparent);
-    transition: left 0.5s;
-}
-
-.agent-button:hover::before {
-    left: 100%;
-}
-
-/* Scanline effect overlay - iPhone X safe area aware */
-body::before {
-    content: '';
-    position: fixed;
-    top: env(safe-area-inset-top);
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, #00ff00, transparent);
-    animation: scanline 3s linear infinite;
-    z-index: 1;
-    pointer-events: none;
-    opacity: 0.3;
-}
-
-/* System message styling with iPhone X safe area */
-.system-message {
-    position: fixed;
-    top: max(10px, env(safe-area-inset-top));
-    right: max(10px, env(safe-area-inset-right));
-    background: rgba(0, 255, 0, 0.1);
-    border: 1px solid #00ff00;
-    color: #00ff00;
-    padding: 8px 12px;
-    font-size: 14px;
-    font-family: monospace;
-    z-index: 1000;
+@keyframes slideInLeft {
+  from {
     opacity: 0;
-    transition: opacity 0.5s;
-}
-
-/* Enhanced progress bar for audio with iPhone X touch */
-.audio-progress-container {
-    background: rgba(0, 255, 0, 0.1);
-    border: 1px solid #00ff00;
-    height: 8px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    touch-action: manipulation;
-    min-height: 48px; /* iPhone X touch target */
-    display: flex;
-    align-items: center;
-}
-
-.audio-progress-bar {
-    background: #00ff00;
-    height: 8px;
-    transition: width 0.1s ease;
-    box-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
-}
-
-.audio-progress-container:hover .audio-progress-bar {
-    box-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
-}
-
-/* Speed control buttons with iPhone X optimization */
-.speed-control {
-    display: flex;
-    gap: 6px;
-    margin-top: 15px;
-}
-
-.speed-btn {
-    background: rgba(0, 255, 0, 0.1);
-    border: 1px solid #00ff00;
-    color: #00ff00;
-    padding: 8px 12px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.2s;
-    min-height: 48px; /* iPhone X touch target */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    touch-action: manipulation;
-}
-
-.speed-btn:hover {
-    background: rgba(0, 255, 0, 0.2);
-    box-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
-}
-
-.speed-btn.active {
-    background: #00ff00;
-    color: black;
-}
-
-/* Mysterious Landing Page Styles with iPhone X optimization */
-.mysterious-container {
-    text-align: center;
-    width: 100%;
-    max-width: 600px;
-    padding: 0 max(20px, env(safe-area-inset-left)) max(25px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-right));
-}
-
-.typewriter {
-    overflow: hidden;
-    white-space: nowrap;
-    margin: 0 auto;
-    letter-spacing: .1em;
-    animation: typing 4s steps(40, end), blink-caret .75s step-end infinite;
-    border-right: 3px solid #00ff00;
-    font-size: clamp(16px, 4vw, 24px);
-}
-
-@keyframes typing {
-    from { width: 0 }
-    to { width: 100% }
-}
-
-@keyframes blink-caret {
-    from, to { border-color: transparent }
-    50% { border-color: #00ff00; }
-}
-
-.fade-in {
-    opacity: 0;
-    animation: fadeIn 2s ease-in 5s forwards;
-}
-
-@keyframes fadeIn {
-    to { opacity: 1; }
-}
-
-/* iPhone X optimized access button */
-.access-btn {
-    background: transparent;
-    border: 1px solid #00ff00;
-    color: #00ff00;
-    padding: 18px 35px;
-    font-family: monospace;
-    cursor: pointer;
-    margin-top: 35px;
-    transition: all 0.3s;
-    min-height: 52px; /* Larger for iPhone X */
-    touch-action: manipulation;
-    font-size: 16px; /* Prevent zoom on iPhone X */
-}
-
-.access-btn:hover {
-    background: rgba(0, 255, 0, 0.1);
-    box-shadow: 0 0 10px #00ff00;
-}
-
-/* iPhone X optimized start over button */
-.start-over-btn {
-    background: rgba(0, 255, 0, 0.2) !important;
-    border: 1px solid #00ff00 !important;
-    color: #00ff00 !important;
-    padding: 15px 25px !important;
-    font-family: monospace !important;
-    font-size: 16px !important;
-    cursor: pointer !important;
-    margin-top: 30px !important;
-    transition: all 0.2s !important;
-    min-height: 52px !important; /* iPhone X touch target */
-    touch-action: manipulation !important;
-}
-
-.start-over-btn:hover {
-    background: rgba(0, 255, 0, 0.3) !important;
-    box-shadow: 0 0 10px rgba(0, 255, 0, 0.5) !important;
-}
-
-/* Blinking text animation for mission critical alerts */
-.blink-text {
-    animation: blink 1s linear infinite;
-}
-
-@keyframes blink {
-    0% { opacity: 1; }
-    50% { opacity: 0; }
-    100% { opacity: 1; }
-}
-
-/* iPhone X Specific Input Optimizations */
-input[type="text"], input[type="password"], textarea {
-    font-size: 16px !important; /* Prevent zoom on iPhone X */
-    -webkit-appearance: none;
-    -webkit-border-radius: 0;
-    border-radius: 0;
-    /* iOS Safari input optimization */
-    -webkit-user-select: text;
-    user-select: text;
-    /* Prevent callouts on long press */
-    -webkit-touch-callout: default;
-}
-
-/* iPhone X Copy-Paste Optimization for Coordinates */
-.coordinate-text {
-    user-select: all;
-    -webkit-user-select: all;
-    -webkit-touch-callout: default;
-    cursor: pointer;
-    padding: 6px;
-}
-
-/* iPhone X Portrait Lock Support */
-@media screen and (orientation: landscape) and (max-height: 480px) {
-    .landscape-warning {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.9);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 9999;
-        color: #00ff00;
-        font-family: monospace;
-        text-align: center;
-        padding: 20px;
-    }
-}
-
-/* Fixed positioning for bottom mission timer */
-.fixed.bottom-4.left-4 {
-    position: fixed !important;
-    bottom: max(20px, env(safe-area-inset-bottom)) !important;
-    left: max(20px, env(safe-area-inset-left)) !important;
-    z-index: 10 !important;
-    pointer-events: none; /* Don't interfere with other elements */
-}
-
-/* Ensure content doesn't overlap with fixed bottom elements */
-.min-h-screen {
-    padding-bottom: max(80px, env(safe-area-inset-bottom)) !important;
-}
-
-/* Score popup animations */
-.score-popup {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 9999;
-  font-size: 24px;
-  font-weight: bold;
-  animation: scorePopup 3s ease-out forwards;
-  padding: 15px 25px;
-  border-radius: 10px;
-  background: rgba(0, 0, 0, 0.9);
-  border: 2px solid #00ff41;
-  color: #00ff41;
-  font-family: monospace;
-  max-width: 90vw;
-  text-align: center;
-}
-
-.score-positive { 
-  color: #00ff41; 
-}
-
-.score-negative { 
-  color: #ff4444; 
-}
-
-.score-neutral { 
-  color: #ffff00; 
-}
-
-.invalid-attempt-popup {
-  position: fixed;
-  top: 30%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 9999;
-  font-size: 18px;
-  font-weight: bold;
-  color: #ff4444;
-  background: rgba(139, 0, 0, 0.9);
-  padding: 15px 25px;
-  border-radius: 8px;
-  border: 2px solid #ff4444;
-  animation: invalidAttemptShake 1.5s ease-out forwards;
-  font-family: monospace;
-  text-align: center;
-  max-width: 90vw;
-}
-
-@keyframes scorePopup {
-  0% { 
-    opacity: 0; 
-    transform: translate(-50%, -50%) scale(0.5); 
+    transform: translateX(-100%);
   }
-  15% { 
-    opacity: 1; 
-    transform: translate(-50%, -50%) scale(1.2); 
-  }
-  25% { 
-    opacity: 1; 
-    transform: translate(-50%, -50%) scale(1.0); 
-  }
-  85% { 
-    opacity: 1; 
-    transform: translate(-50%, -50%) scale(1.0); 
-  }
-  100% { 
-    opacity: 0; 
-    transform: translate(-50%, -50%) scale(0.8); 
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 
-@keyframes invalidAttemptShake {
-  0%, 100% { 
-    transform: translate(-50%, -50%) translateX(0);
+@keyframes pulse {
+  0%, 100% {
     opacity: 1;
   }
-  10%, 30%, 50%, 70%, 90% { 
-    transform: translate(-50%, -50%) translateX(-8px); 
-  }
-  20%, 40%, 60%, 80% { 
-    transform: translate(-50%, -50%) translateX(8px); 
-  }
-  95% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
+  50% {
+    opacity: 0.7;
   }
 }
 
-/* Timer display styles */
-.timer-display {
-  font-family: 'Courier New', monospace;
-  text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+/* Score Colors */
+.score-positive {
+  color: #4ade80;
 }
 
-/* Mobile optimizations for iPhone X */
+.score-negative {
+  color: #ef4444;
+}
+
+.score-neutral {
+  color: #fbbf24;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+  .score-header {
+    padding: 0.5rem;
+  }
+  
+  .score-container {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .current-score {
+    gap: 0.5rem;
+  }
+  
+  .score-popup {
+    top: 4rem;
+    left: 1rem;
+    right: 1rem;
+    transform: none;
+    width: auto;
+  }
+  
+  .timer-display {
+    top: 0.5rem;
+    right: 0.5rem;
+  }
+}
+
+/* iPhone X and newer safe area support */
 @supports (padding: max(0px)) {
+  .score-header {
+    padding-left: max(0.75rem, env(safe-area-inset-left));
+    padding-right: max(0.75rem, env(safe-area-inset-right));
+    padding-top: max(0.75rem, env(safe-area-inset-top));
+  }
+  
   .timer-display {
     top: max(1rem, env(safe-area-inset-top));
     right: max(1rem, env(safe-area-inset-right));
   }
-  
-  .score-popup,
-  .invalid-attempt-popup {
-    padding-left: max(15px, env(safe-area-inset-left));
-    padding-right: max(15px, env(safe-area-inset-right));
+}
+
+/* Success and Error Feedback */
+.success-popup {
+  background: rgba(34, 197, 94, 0.95);
+  border-color: #22c55e;
+  color: #f0fdf4;
+}
+
+.error-popup {
+  background: rgba(239, 68, 68, 0.95);
+  border-color: #ef4444;
+  color: #fef2f2;
+}
+
+/* Loading Animations */
+.loading-dots::after {
+  content: '';
+  animation: loadingDots 1.5s infinite;
+}
+
+@keyframes loadingDots {
+  0%, 20% {
+    content: '';
+  }
+  40% {
+    content: '.';
+  }
+  60% {
+    content: '..';
+  }
+  80%, 100% {
+    content: '...';
   }
 }
 
-/* Responsive text sizing for mobile */
-@media (max-width: 768px) {
-  .score-popup {
-    font-size: 18px;
-    padding: 12px 20px;
-    max-width: 85vw;
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .score-header {
+    background: #000;
+    border-bottom: 2px solid #4ade80;
   }
   
-  .invalid-attempt-popup {
-    font-size: 16px;
-    padding: 12px 20px;
-    max-width: 85vw;
-  }
-  
-  .timer-display {
-    font-size: 12px;
+  input[type="text"], input[type="password"] {
+    border-width: 3px !important;
   }
 }
 
-/* Enhanced mobile support for very small screens */
-@media (max-width: 375px) {
-  .score-popup {
-    font-size: 16px;
-    padding: 10px 15px;
-  }
-  
-  .invalid-attempt-popup {
-    font-size: 14px;
-    padding: 10px 15px;
-  }
+/* Focus improvements for accessibility */
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid #4ade80;
+  outline-offset: 2px;
+}
+
+/* Prevent text selection on game elements */
+.game-element {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Allow text selection on input fields */
+input {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
 }

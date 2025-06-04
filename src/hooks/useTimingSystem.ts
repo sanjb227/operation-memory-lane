@@ -29,13 +29,21 @@ interface FinalScoreData {
   completionBonus: number;
 }
 
+// Helper function to emit score update events
+const emitScoreUpdate = (newScore?: number, points?: number, reason?: string) => {
+  const event = new CustomEvent('scoreUpdate', {
+    detail: { newScore, points, reason }
+  });
+  window.dispatchEvent(event);
+};
+
 export const useTimingSystem = (sessionId: string, currentCheckpoint: number) => {
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [invalidAttempts, setInvalidAttempts] = useState(0);
 
-  // Timer display
+  // Timer display with proper typing
   useEffect(() => {
     let interval: number;
     
@@ -60,11 +68,15 @@ export const useTimingSystem = (sessionId: string, currentCheckpoint: number) =>
 
   const startCheckpointTimer = useCallback(async (checkpoint: number) => {
     try {
+      console.log('Starting checkpoint timer for:', checkpoint);
       const { data, error } = await supabase.functions.invoke('checkpoint-timing/start', {
         body: { checkpoint, sessionId }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error starting timer:', error);
+        throw error;
+      }
 
       if (data.success) {
         const start = new Date(data.startTime);
@@ -72,26 +84,41 @@ export const useTimingSystem = (sessionId: string, currentCheckpoint: number) =>
         setIsRunning(true);
         setElapsedTime(0);
         setInvalidAttempts(0);
-        console.log('Timer started for checkpoint:', checkpoint);
+        console.log('Timer started successfully for checkpoint:', checkpoint);
       }
     } catch (error) {
       console.error('Error starting timer:', error);
+      // Fallback: start local timer
+      setStartTime(new Date());
+      setIsRunning(true);
+      setElapsedTime(0);
+      setInvalidAttempts(0);
     }
   }, [sessionId]);
 
   const validateCode = useCallback(async (code: string, correctCodes: string[], checkpoint: number) => {
     try {
+      console.log('Validating code:', { code, checkpoint });
       const { data, error } = await supabase.functions.invoke('checkpoint-timing/attempt', {
         body: { checkpoint, sessionId, code, correctCodes }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error validating code:', error);
+        throw error;
+      }
 
       if (data.success && !data.correct) {
         setInvalidAttempts(prev => prev + 1);
+        console.log('Invalid attempt recorded, penalty applied:', data.penalty);
+        
+        // Emit score update for penalty
+        emitScoreUpdate(undefined, data.penalty, 'Invalid Code');
+        
         return { isValid: false, penalty: data.penalty, totalInvalidAttempts: data.totalInvalidAttempts };
       }
 
+      console.log('Code validation result:', data.correct);
       return { isValid: data.correct, penalty: 0 };
     } catch (error) {
       console.error('Error validating code:', error);
@@ -101,54 +128,88 @@ export const useTimingSystem = (sessionId: string, currentCheckpoint: number) =>
 
   const completeCheckpoint = useCallback(async (checkpoint: number, lifelinesUsed: number) => {
     try {
+      console.log('Completing checkpoint:', { checkpoint, lifelinesUsed, invalidAttempts });
       setIsRunning(false);
       
       const { data, error } = await supabase.functions.invoke('checkpoint-timing/complete', {
         body: { checkpoint, sessionId, lifelinesUsed, invalidAttempts }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error completing checkpoint:', error);
+        throw error;
+      }
 
       if (data.success) {
+        console.log('Checkpoint completed successfully, score:', data.score);
+        
+        // Emit score update for checkpoint completion
+        emitScoreUpdate(undefined, data.score.netScore, `Checkpoint ${checkpoint + 1} Complete`);
+        
         return data.score as ScoreBreakdown;
       }
     } catch (error) {
       console.error('Error completing checkpoint:', error);
+      // Return fallback score
+      return {
+        timeScore: 5,
+        lifelinePenalty: 0,
+        invalidAttemptPenalty: 0,
+        netScore: 5,
+        duration: elapsedTime,
+        durationMinutes: elapsedTime / 60
+      } as ScoreBreakdown;
     }
     return null;
-  }, [sessionId, invalidAttempts]);
+  }, [sessionId, invalidAttempts, elapsedTime]);
 
   const recordLifelineUse = useCallback(async (checkpoint: number) => {
     try {
+      console.log('Recording lifeline use for checkpoint:', checkpoint);
       const { data, error } = await supabase.functions.invoke('checkpoint-timing/lifeline', {
         body: { checkpoint, sessionId }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error recording lifeline use:', error);
+        throw error;
+      }
 
-      return data.success;
+      if (data.success) {
+        console.log('Lifeline use recorded successfully, penalty:', data.penalty);
+        
+        // Emit score update for lifeline penalty
+        emitScoreUpdate(undefined, data.penalty, 'Lifeline Used');
+        
+        return data.success;
+      }
     } catch (error) {
       console.error('Error recording lifeline use:', error);
-      return false;
     }
+    return false;
   }, [sessionId]);
 
   const getFinalScore = useCallback(async (): Promise<FinalScoreData | null> => {
     try {
+      console.log('Getting final score for session:', sessionId);
       const { data, error } = await supabase.functions.invoke('checkpoint-timing/final-score', {
         method: 'GET'
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error getting final score:', error);
+        throw error;
+      }
 
       if (data.success) {
+        console.log('Final score retrieved successfully:', data);
         return data as FinalScoreData;
       }
     } catch (error) {
       console.error('Error getting final score:', error);
     }
     return null;
-  }, []);
+  }, [sessionId]);
 
   return {
     elapsedTime,

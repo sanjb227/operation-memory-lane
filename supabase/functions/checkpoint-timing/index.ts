@@ -24,6 +24,7 @@ serve(async (req) => {
 
     if (method === 'POST' && path === 'start') {
       const { checkpoint, sessionId } = await req.json();
+      console.log('Starting checkpoint timer:', { checkpoint, sessionId });
       
       const startTime = new Date().toISOString();
       
@@ -55,11 +56,13 @@ serve(async (req) => {
 
     if (method === 'POST' && path === 'attempt') {
       const { checkpoint, sessionId, code, correctCodes } = await req.json();
+      console.log('Validating attempt:', { checkpoint, sessionId, code });
       
       const correctCode = correctCodes[checkpoint]?.toUpperCase();
       const isCorrect = code.trim().toUpperCase() === correctCode;
       
       if (!isCorrect) {
+        console.log('Invalid attempt detected');
         // Log invalid attempt
         const { error: attemptError } = await supabase
           .from('invalid_attempts')
@@ -104,6 +107,7 @@ serve(async (req) => {
         });
       }
 
+      console.log('Code accepted');
       return new Response(JSON.stringify({ 
         success: true, 
         correct: true,
@@ -115,6 +119,7 @@ serve(async (req) => {
 
     if (method === 'POST' && path === 'complete') {
       const { checkpoint, sessionId, lifelinesUsed, invalidAttempts } = await req.json();
+      console.log('Completing checkpoint:', { checkpoint, sessionId });
       
       const endTime = new Date().toISOString();
       
@@ -127,6 +132,7 @@ serve(async (req) => {
         .single();
 
       if (!timingData) {
+        console.error('Timing data not found for checkpoint completion');
         return new Response(JSON.stringify({ success: false, error: 'Timing data not found' }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 404
@@ -137,7 +143,7 @@ serve(async (req) => {
       const duration = Math.floor((new Date(endTime).getTime() - startTime.getTime()) / 1000);
       const durationMinutes = duration / 60;
 
-      // Calculate score
+      // Calculate score - ENSURE SCORE IS ALWAYS CALCULATED
       const PAR_TIME_MINUTES = 7;
       let timeScore = 0;
       
@@ -152,6 +158,8 @@ serve(async (req) => {
       const lifelinePenalty = (timingData.lifelines_used_count || 0) * 3;
       const invalidAttemptPenalty = (timingData.invalid_attempts_count || 0) * 2;
       const netScore = Math.max(0, timeScore - lifelinePenalty - invalidAttemptPenalty);
+
+      console.log('Score calculation:', { timeScore, lifelinePenalty, invalidAttemptPenalty, netScore, durationMinutes });
 
       // Update checkpoint timing
       const { error } = await supabase
@@ -184,6 +192,8 @@ serve(async (req) => {
         durationMinutes: Math.round(durationMinutes * 100) / 100
       };
 
+      console.log('Checkpoint completed successfully:', scoreBreakdown);
+
       return new Response(JSON.stringify({ 
         success: true, 
         endTime,
@@ -196,6 +206,7 @@ serve(async (req) => {
 
     if (method === 'POST' && path === 'lifeline') {
       const { checkpoint, sessionId } = await req.json();
+      console.log('Recording lifeline use:', { checkpoint, sessionId });
       
       // Update lifeline count
       const { data: timingData } = await supabase
@@ -223,9 +234,43 @@ serve(async (req) => {
         });
       }
 
+      console.log('Lifeline recorded successfully');
       return new Response(JSON.stringify({ 
         success: true, 
-        totalLifelinesUsed: newLifelineCount
+        totalLifelinesUsed: newLifelineCount,
+        penalty: -3
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    if (method === 'GET' && path === 'current-score') {
+      const sessionId = url.searchParams.get('sessionId');
+      console.log('Getting current score for session:', sessionId);
+      
+      if (!sessionId) {
+        return new Response(JSON.stringify({ success: false, error: 'Session ID required' }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400
+        });
+      }
+
+      // Get all completed checkpoints
+      const { data: checkpointScores } = await supabase
+        .from('checkpoint_timing')
+        .select('*')
+        .eq('session_id', sessionId)
+        .not('net_score', 'is', null)
+        .order('checkpoint_number');
+
+      const currentScore = checkpointScores?.reduce((sum, score) => sum + (score.net_score || 0), 0) || 0;
+      
+      console.log('Current score calculated:', currentScore);
+
+      return new Response(JSON.stringify({
+        success: true,
+        currentScore,
+        checkpoints: checkpointScores || []
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
@@ -233,6 +278,7 @@ serve(async (req) => {
 
     if (method === 'GET' && path === 'final-score') {
       const sessionId = url.searchParams.get('sessionId');
+      console.log('Getting final score for session:', sessionId);
       
       if (!sessionId) {
         return new Response(JSON.stringify({ success: false, error: 'Session ID required' }), {
@@ -249,11 +295,14 @@ serve(async (req) => {
         .order('checkpoint_number');
 
       if (!checkpointScores || checkpointScores.length === 0) {
+        console.error('No checkpoint data found for final score');
         return new Response(JSON.stringify({ success: false, error: 'No checkpoint data found' }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 404
         });
       }
+
+      console.log('Final score checkpoint data:', checkpointScores);
 
       const totalCheckpointScore = checkpointScores.reduce((sum, score) => sum + (score.net_score || 0), 0);
       const totalLifelinesUsed = checkpointScores.reduce((sum, score) => sum + (score.lifelines_used_count || 0), 0);
@@ -275,6 +324,8 @@ serve(async (req) => {
 
       const agentRank = AGENT_RANKS.find(rank => finalScore >= rank.min && finalScore <= rank.max) || AGENT_RANKS[4];
 
+      console.log('Final score calculated successfully:', { finalScore, agentRank });
+
       return new Response(JSON.stringify({
         success: true,
         totalScore: finalScore,
@@ -290,6 +341,7 @@ serve(async (req) => {
       });
     }
 
+    console.log('Endpoint not found:', path);
     return new Response(JSON.stringify({ success: false, error: 'Endpoint not found' }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 404

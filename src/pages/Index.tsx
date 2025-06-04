@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import WelcomeScreen from '../components/WelcomeScreen';
 import MissionBriefing from '../components/MissionBriefing';
@@ -11,6 +12,7 @@ import TimerDisplay from '../components/TimerDisplay';
 import ScorePopup from '../components/ScorePopup';
 import InvalidAttemptPopup from '../components/InvalidAttemptPopup';
 import FinalScoreDisplay from '../components/FinalScoreDisplay';
+import ScoreHeader from '../components/ScoreHeader';
 import { GamePhase } from '../types/game';
 import { useGameProgress } from '../hooks/useGameProgress';
 import { useTimingSystem } from '../hooks/useTimingSystem';

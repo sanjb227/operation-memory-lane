@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { getClueText, getLifelineText } from '../utils/clueData';
 
 interface ClueInterfaceProps {
@@ -27,8 +27,37 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
   const [showHelp, setShowHelp] = useState(false);
   const [showClueSupport, setShowClueSupport] = useState(false);
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  React.useEffect(() => {
+  // Fix input focus and initialization
+  useEffect(() => {
+    const initializeInput = () => {
+      if (inputRef.current) {
+        // Ensure input is enabled and focusable
+        inputRef.current.disabled = false;
+        inputRef.current.readOnly = false;
+        inputRef.current.style.pointerEvents = 'auto';
+        inputRef.current.style.opacity = '1';
+        
+        // Force focus after a brief delay
+        setTimeout(() => {
+          if (inputRef.current) {
+            inputRef.current.focus();
+          }
+        }, 100);
+      }
+    };
+
+    initializeInput();
+    
+    // Re-initialize on checkpoint change
+    const timer = setTimeout(initializeInput, 500);
+    
+    return () => clearTimeout(timer);
+  }, [currentCheckpoint]);
+
+  // Handle resize events
+  useEffect(() => {
     const handleResize = () => {
       setIsDesktop(window.innerWidth >= 768);
     };
@@ -76,19 +105,53 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
     }
     
     if (inputCode.trim()) {
+      console.log('Submitting code:', inputCode);
       onCodeSubmit(inputCode);
       setInputCode('');
       setShowLifeline(false);
       setLifelineData(null);
+      
+      // Re-focus input after submission
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
+      }, 100);
     }
   };
 
   const handleLifelineClick = () => {
+    console.log('Lifeline requested');
     const wasUsed = onUseLifeline();
     if (wasUsed) {
       const lifeline = getLifelineText(currentCheckpoint);
       setLifelineData(lifeline);
       setShowLifeline(true);
+      
+      // Show immediate penalty feedback
+      const feedback = document.createElement('div');
+      feedback.textContent = '🔴 LIFELINE USED: -3 POINTS';
+      feedback.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(255, 0, 0, 0.9);
+        color: white;
+        padding: 16px 24px;
+        font-family: monospace;
+        font-size: 16px;
+        border: 2px solid #ff0000;
+        z-index: 1000;
+        border-radius: 8px;
+        text-align: center;
+        font-weight: bold;
+      `;
+      document.body.appendChild(feedback);
+      setTimeout(() => {
+        feedback.style.opacity = '0';
+        setTimeout(() => feedback.remove(), 300);
+      }, 2000);
     }
   };
 
@@ -155,16 +218,16 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
   const isCheckpoint5ScienceLibrary = currentCheckpoint === 4; // Science Library at position 4 (0-indexed)
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ 
-      paddingTop: `max(1rem, env(safe-area-inset-top))`,
+    <div className="min-h-screen flex items-center justify-center p-4 pt-20" style={{ 
+      paddingTop: `max(5rem, env(safe-area-inset-top) + 3rem)`,
       paddingBottom: `max(1rem, env(safe-area-inset-bottom))`,
       paddingLeft: `max(1rem, env(safe-area-inset-left))`,
       paddingRight: `max(1rem, env(safe-area-inset-right))`
     }}>
       <div className="max-w-md w-full space-y-4">
         {/* Help Button - iPhone X optimized positioning */}
-        <div className="absolute top-4 left-4" style={{
-          top: `max(1rem, env(safe-area-inset-top))`,
+        <div className="absolute top-20 left-4" style={{
+          top: `max(5rem, env(safe-area-inset-top) + 3rem)`,
           left: `max(1rem, env(safe-area-inset-left))`
         }}>
           <button
@@ -178,9 +241,9 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
 
         {/* Desktop Hint for Checkpoint 5 (Science Library) Only */}
         {isCheckpoint5ScienceLibrary && isDesktop && (
-          <div className="desktop-hint">
-            <div className="text-xs font-bold mb-1">DESKTOP ACCESS GRANTED</div>
-            <div className="text-xs">PASSWORD: SCI SPY</div>
+          <div className="bg-green-900/20 border border-green-400 p-3 text-center">
+            <div className="text-xs font-bold mb-1 text-green-300">DESKTOP ACCESS GRANTED</div>
+            <div className="text-xs text-green-400">PASSWORD: SCI SPY</div>
           </div>
         )}
 
@@ -244,7 +307,7 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
           </div>
         )}
 
-        {/* Lifeline Popup - iPhone X optimized */}
+        {/* Lifeline Popup with navigation back capability */}
         {showLifeline && lifelineData && (
           <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50" style={{
             paddingTop: `max(1rem, env(safe-area-inset-top))`,
@@ -263,7 +326,7 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
               <div className="mb-4">
                 <div className="text-yellow-300 text-xs font-bold mb-1">Coordinates:</div>
                 <div 
-                  className="bg-gray-900 border border-yellow-400 p-3 text-yellow-200 text-sm font-mono coordinate-text cursor-pointer"
+                  className="bg-gray-900 border border-yellow-400 p-3 text-yellow-200 text-sm font-mono cursor-pointer"
                   onClick={() => copyToClipboard(lifelineData.coordinates)}
                   style={{ 
                     minHeight: '44px', 
@@ -287,13 +350,23 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
                 </div>
               </div>
 
-              <button
-                onClick={() => setShowLifeline(false)}
-                className="w-full bg-red-600 hover:bg-red-500 text-black font-bold py-2 px-4 transition-colors"
-                style={{ minHeight: '48px', touchAction: 'manipulation', fontSize: '16px' }}
-              >
-                [CLOSE LIFELINE]
-              </button>
+              <div className="space-y-2">
+                <button
+                  onClick={() => setShowLifeline(false)}
+                  className="w-full bg-red-600 hover:bg-red-500 text-black font-bold py-2 px-4 transition-colors"
+                  style={{ minHeight: '48px', touchAction: 'manipulation', fontSize: '16px' }}
+                >
+                  [CLOSE LIFELINE]
+                </button>
+                
+                <button
+                  onClick={() => setShowLifeline(true)}
+                  className="w-full bg-gray-600 hover:bg-gray-500 text-white border border-gray-400 py-2 px-4 transition-colors text-sm"
+                  style={{ minHeight: '44px', touchAction: 'manipulation' }}
+                >
+                  [VIEW LIFELINE AGAIN]
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -319,28 +392,38 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
           </div>
         </div>
 
-        {/* Code Input - Always show for all checkpoints with iPhone X optimization */}
+        {/* Code Input - Enhanced with better focus management */}
         <form onSubmit={handleSubmit} className="space-y-4 mb-6">
           <div className="border border-green-400 p-4 bg-black/90">
             <label className="block text-xs font-bold mb-3 text-green-300">
               ENTER CODE:
             </label>
             <input
+              ref={inputRef}
               type="text"
               value={inputCode}
               onChange={(e) => setInputCode(e.target.value.toUpperCase())}
-              className="w-full bg-black border border-green-600 text-green-400 px-3 py-3 text-sm font-mono focus:outline-none focus:border-green-300 mb-4"
+              onFocus={(e) => {
+                console.log('Input focused');
+                e.target.style.backgroundColor = '#000';
+                e.target.style.color = '#4ade80';
+              }}
+              className="w-full bg-black border border-green-600 text-green-400 px-3 py-3 text-sm font-mono focus:outline-none focus:border-green-300 focus:ring-2 focus:ring-green-300/20 mb-4"
               placeholder="TYPE CODE HERE..."
               maxLength={20}
               style={{ 
                 fontSize: '16px', 
                 minHeight: '48px',
-                touchAction: 'manipulation'
+                touchAction: 'manipulation',
+                WebkitAppearance: 'none',
+                border: '2px solid #16a34a'
               }}
               autoComplete="off"
               autoCorrect="off"
               autoCapitalize="characters"
               spellCheck="false"
+              disabled={false}
+              readOnly={false}
             />
           </div>
           
@@ -358,7 +441,7 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
           </button>
         </form>
 
-        {/* Lifeline Button - iPhone X optimized */}
+        {/* Lifeline Button - Enhanced with better feedback */}
         <button
           onClick={handleLifelineClick}
           className={`w-full py-3 px-4 border text-sm transition-colors duration-200 mb-4 ${
@@ -373,8 +456,23 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
             fontSize: '16px'
           }}
         >
-          {lifelinesRemaining > 0 ? '[REQUEST LIFELINE]' : '[NO LIFELINES REMAINING]'}
+          {lifelinesRemaining > 0 ? '[REQUEST LIFELINE] (-3 POINTS)' : '[NO LIFELINES REMAINING]'}
         </button>
+
+        {/* Show lifeline again button if lifeline was used */}
+        {lifelineData && !showLifeline && (
+          <button
+            onClick={() => setShowLifeline(true)}
+            className="w-full py-3 px-4 border border-orange-400 text-orange-400 hover:bg-orange-400 hover:text-black text-sm transition-colors duration-200 mb-4"
+            style={{ 
+              minHeight: '52px', 
+              touchAction: 'manipulation',
+              fontSize: '16px'
+            }}
+          >
+            [VIEW LIFELINE AGAIN]
+          </button>
+        )}
 
         {/* Clue Missing Support Button - iPhone X optimized */}
         <button
@@ -393,7 +491,7 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
         {showError && (
           <div className="border border-red-500 bg-red-900/20 p-3 text-center mb-4">
             <div className="text-red-400 text-sm font-bold">
-              ACCESS DENIED - INVALID CODE
+              ACCESS DENIED - INVALID CODE (-2 POINTS)
             </div>
           </div>
         )}
