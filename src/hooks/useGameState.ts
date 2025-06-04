@@ -1,4 +1,3 @@
-
 import { useState, useCallback, useEffect } from 'react';
 import { saveGameState, loadGameState, clearGameState, hasStoredGameState, loadSharedSession } from '../utils/sessionStorage';
 
@@ -94,7 +93,7 @@ export const useGameState = () => {
         isGameComplete: sharedSession.isGameComplete,
         notifications: []
       });
-      addNotification("Game resumed from shared session", "info");
+      // Don't add notification here - it was causing persistent notifications
       return;
     }
 
@@ -119,7 +118,7 @@ export const useGameState = () => {
         isGameComplete: savedState.isGameComplete,
         notifications: []
       });
-      addNotification("Game resumed from where you left off", "info");
+      // Don't add persistent notification for resumed games
     }
     setShowRecoveryModal(false);
   }, []);
