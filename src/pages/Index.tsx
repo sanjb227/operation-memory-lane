@@ -10,6 +10,7 @@ import SystemMessages from '../components/SystemMessages';
 import TimerDisplay from '../components/TimerDisplay';
 import ScoreDisplay from '../components/ScoreDisplay';
 import FinalScoreDisplay from '../components/FinalScoreDisplay';
+import GameRecoveryModal from '../components/GameRecoveryModal';
 import { GamePhase } from '../types/game';
 import { useGameState } from '../hooks/useGameState';
 
@@ -37,17 +38,28 @@ const Index = () => {
 
   const {
     gameState,
+    showRecoveryModal,
     calculateFinalScore,
+    initializeGame,
+    resumeGame,
+    startNewGame,
     startGame,
     startCheckpoint,
     completeCheckpoint,
     useLifeline,
     recordInvalidAttempt,
+    skipCheckpoint5,
     completeGame,
     addNotification,
     removeNotification,
-    resetGame
+    resetGame,
+    persistGameState
   } = useGameState();
+
+  // Initialize game and check for saved state
+  useEffect(() => {
+    initializeGame();
+  }, [initializeGame]);
 
   // Timer logic
   useEffect(() => {
@@ -82,6 +94,13 @@ const Index = () => {
     }
   }, [currentPhase, gameState.currentCheckpoint, startCheckpoint]);
 
+  // Auto-save on significant game state changes
+  useEffect(() => {
+    if (gameState.gameStartTime) {
+      persistGameState();
+    }
+  }, [gameState.currentCheckpoint, gameState.totalScore, gameState.totalLifelinesUsed, persistGameState]);
+
   const handleMysteriousLanding = () => {
     setShowMysteriousLanding(false);
   };
@@ -102,6 +121,39 @@ const Index = () => {
   const handleCodeSubmit = (code: string): boolean => {
     const trimmedCode = code.trim().toUpperCase();
     const correctCode = correctCodes[gameState.currentCheckpoint];
+    
+    // Special handling for checkpoint 5 mobile completion
+    if (trimmedCode === "CHECKPOINT5_MOBILE_COMPLETE" && gameState.currentCheckpoint === 4) {
+      const points = completeCheckpoint();
+      const newEnteredCodes = [...enteredCodes, "SCI SPY"]; // Use the actual code
+      setEnteredCodes(newEnteredCodes);
+      
+      setShowSuccessMessage(true);
+      addNotification(`+${points} points earned! (Mobile bypass)`, "success");
+      
+      setTimeout(() => {
+        setShowSuccessMessage(false);
+        
+        if (gameState.currentCheckpoint < correctCodes.length - 1) {
+          const nextCheckpoint = gameState.currentCheckpoint + 1;
+          
+          if (nextCheckpoint === 6) {
+            setShowCheckpoint7Handler(true);
+          } else if (nextCheckpoint === 7) {
+            setShowPreFinalModal(true);
+          } else {
+            startCheckpoint(nextCheckpoint);
+            setElapsedTime(0);
+          }
+        } else {
+          completeGame();
+          setIsTimerRunning(false);
+          setCurrentPhase('final');
+        }
+      }, 2000);
+      
+      return true;
+    }
     
     if (trimmedCode !== correctCode) {
       recordInvalidAttempt();
@@ -128,12 +180,10 @@ const Index = () => {
         } else if (nextCheckpoint === 7) {
           setShowPreFinalModal(true);
         } else {
-          // Auto-advance to next checkpoint
           startCheckpoint(nextCheckpoint);
           setElapsedTime(0);
         }
       } else {
-        // Game complete
         completeGame();
         setIsTimerRunning(false);
         setCurrentPhase('final');
@@ -148,10 +198,21 @@ const Index = () => {
       const newLifelines = lifelinesRemaining - 1;
       setLifelinesRemaining(newLifelines);
       useLifeline();
-      addNotification("Lifeline used! -3 points", "info");
+      addNotification("Lifeline used! -3 points", "lifeline");
       return true;
     }
     return false;
+  };
+
+  const handleSkipCheckpoint5 = () => {
+    skipCheckpoint5();
+    addNotification("Checkpoint 5 skipped! -5 points", "lifeline");
+    
+    setTimeout(() => {
+      const nextCheckpoint = gameState.currentCheckpoint + 1;
+      startCheckpoint(nextCheckpoint);
+      setElapsedTime(0);
+    }, 2000);
   };
 
   const handleCheckpoint7Continue = () => {
@@ -167,7 +228,6 @@ const Index = () => {
   };
 
   const handleStartOver = () => {
-    // Reset all state
     resetGame();
     setLifelinesRemaining(3);
     setEnteredCodes([]);
@@ -179,6 +239,37 @@ const Index = () => {
     setElapsedTime(0);
     setIsTimerRunning(false);
   };
+
+  const handleResumeGame = () => {
+    resumeGame();
+    setLifelinesRemaining(3 - gameState.totalLifelinesUsed);
+    setCurrentPhase('clue');
+  };
+
+  const handleStartNewGameFromRecovery = () => {
+    startNewGame();
+    setLifelinesRemaining(3);
+    setEnteredCodes([]);
+    setCurrentPhase('welcome');
+    setShowCheckpoint7Handler(false);
+    setShowPreFinalModal(false);
+    setShowMysteriousLanding(true);
+    setShowSuccessMessage(false);
+    setElapsedTime(0);
+    setIsTimerRunning(false);
+  };
+
+  // Show game recovery modal
+  if (showRecoveryModal) {
+    return (
+      <GameRecoveryModal
+        onResume={handleResumeGame}
+        onNewGame={handleStartNewGameFromRecovery}
+        savedCheckpoint={gameState.currentCheckpoint}
+        savedScore={gameState.totalScore}
+      />
+    );
+  }
 
   // Show final score page
   if (currentPhase === 'final') {
@@ -251,8 +342,10 @@ const Index = () => {
           lifelinesRemaining={lifelinesRemaining}
           onCodeSubmit={handleCodeSubmit}
           onUseLifeline={handleUseLifeline}
+          onSkipCheckpoint5={handleSkipCheckpoint5}
           totalCheckpoints={correctCodes.length}
           showSuccessMessage={showSuccessMessage}
+          gameState={gameState}
           notifications={gameState.notifications}
           onRemoveNotification={removeNotification}
         />
