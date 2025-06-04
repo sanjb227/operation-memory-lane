@@ -76,7 +76,7 @@ const AutoFadeNotification: React.FC<AutoFadeNotificationProps> = ({
         position: 'fixed',
         top: '120px',
         left: '50%',
-        transform: 'translateX(-50%)',
+        transform: `translateX(-50%) translateY(${isVisible ? '0' : '-20px'})`,
         zIndex: 1000,
         padding: '12px 24px',
         borderRadius: '6px',
@@ -86,7 +86,6 @@ const AutoFadeNotification: React.FC<AutoFadeNotificationProps> = ({
         backdropFilter: 'blur(4px)',
         transition: 'all 0.3s ease-in-out',
         opacity: isVisible ? 1 : 0,
-        transform: `translateX(-50%) translateY(${isVisible ? '0' : '-20px'})`,
         pointerEvents: 'none',
         ...typeStyles
       }}
