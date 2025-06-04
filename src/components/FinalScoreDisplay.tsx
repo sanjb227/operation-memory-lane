@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef } from 'react';
 
 interface FinalScoreDisplayProps {
@@ -77,18 +76,18 @@ const MissionAccomplishedAudio: React.FC = () => {
   };
 
   return (
-    <div className="bg-black border-2 border-green-500 p-6 rounded-lg w-full max-w-2xl mx-auto mb-8">
-      <h3 className="text-green-400 text-xl font-bold text-center mb-4">CLASSIFIED TRANSMISSION</h3>
+    <div className="bg-black border-2 border-green-500 p-3 sm:p-4 md:p-6 rounded-lg w-full max-w-xs sm:max-w-sm md:max-w-2xl mx-auto mb-6 sm:mb-8">
+      <h3 className="text-green-400 text-sm sm:text-base md:text-xl font-bold text-center mb-3 sm:mb-4">CLASSIFIED TRANSMISSION</h3>
       
       {/* Progress Bar */}
-      <div className="mb-4">
+      <div className="mb-3 sm:mb-4">
         <input
           type="range"
           min="0"
           max="100"
           value={(currentTime / duration) * 100}
           onChange={handleProgressChange}
-          className="w-full h-2 bg-green-800 rounded-lg appearance-none slider"
+          className="w-full h-3 sm:h-4 md:h-2 bg-green-800 rounded-lg appearance-none slider cursor-pointer touch-manipulation"
           style={{
             background: `linear-gradient(to right, #22c55e 0%, #22c55e ${(currentTime/duration)*100}%, #166534 ${(currentTime/duration)*100}%, #166534 100%)`
           }}
@@ -96,36 +95,36 @@ const MissionAccomplishedAudio: React.FC = () => {
       </div>
 
       {/* Time Display */}
-      <div className="text-green-400 text-center text-lg font-mono mb-4">
+      <div className="text-green-400 text-center text-sm sm:text-base md:text-lg font-mono mb-3 sm:mb-4">
         {formatTime(currentTime)} / {formatTime(duration)}
       </div>
 
-      {/* Control Buttons */}
-      <div className="flex justify-center gap-2 mb-4">
+      {/* Control Buttons - Mobile First Layout */}
+      <div className="flex flex-wrap justify-center gap-1 sm:gap-2 mb-3 sm:mb-4">
         <button
           onClick={() => jumpTime(-10)}
-          className="bg-black border border-green-500 text-green-400 px-3 py-1 rounded font-mono hover:bg-green-900"
+          className="bg-black border border-green-500 text-green-400 px-2 sm:px-3 py-2 text-xs sm:text-sm rounded font-mono hover:bg-green-900 active:bg-green-800 touch-manipulation min-h-[44px] min-w-[60px] sm:min-w-auto"
         >
           [&lt;&lt;10s]
         </button>
         
         <button
           onClick={handlePlayPause}
-          className="bg-green-600 text-black px-6 py-1 rounded font-mono font-bold hover:bg-green-500"
+          className="bg-green-600 text-black px-3 sm:px-6 py-2 text-xs sm:text-sm rounded font-mono font-bold hover:bg-green-500 active:bg-green-400 touch-manipulation min-h-[44px] min-w-[80px]"
         >
           {isPlaying ? '[PAUSE]' : '[PLAY]'}
         </button>
         
         <button
           onClick={() => jumpTime(10)}
-          className="bg-black border border-green-500 text-green-400 px-3 py-1 rounded font-mono hover:bg-green-900"
+          className="bg-black border border-green-500 text-green-400 px-2 sm:px-3 py-2 text-xs sm:text-sm rounded font-mono hover:bg-green-900 active:bg-green-800 touch-manipulation min-h-[44px] min-w-[60px] sm:min-w-auto"
         >
           [10s&gt;&gt;]
         </button>
         
         <button
           onClick={() => {setCurrentTime(0); if(audioRef.current) audioRef.current.currentTime = 0;}}
-          className="bg-black border border-yellow-500 text-yellow-400 px-3 py-1 rounded font-mono hover:bg-yellow-900"
+          className="bg-black border border-yellow-500 text-yellow-400 px-2 sm:px-3 py-2 text-xs sm:text-sm rounded font-mono hover:bg-yellow-900 active:bg-yellow-800 touch-manipulation min-h-[44px] min-w-[70px]"
         >
           [REPLAY]
         </button>
@@ -135,7 +134,7 @@ const MissionAccomplishedAudio: React.FC = () => {
       <div className="text-center">
         <button
           onClick={() => handleSpeedChange(playbackRate === 1 ? 1.5 : 1)}
-          className="bg-black border border-yellow-500 text-yellow-400 px-4 py-1 rounded font-mono hover:bg-yellow-900"
+          className="bg-black border border-yellow-500 text-yellow-400 px-3 sm:px-4 py-2 text-xs sm:text-sm rounded font-mono hover:bg-yellow-900 active:bg-yellow-800 touch-manipulation min-h-[44px] min-w-[60px]"
         >
           [{playbackRate}x]
         </button>
