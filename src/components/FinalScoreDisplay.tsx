@@ -1,5 +1,4 @@
-
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 
 interface FinalScoreDisplayProps {
   totalScore: number;
@@ -9,6 +8,131 @@ interface FinalScoreDisplayProps {
   checkpointTimes: number[];
   onStartOver: () => void;
 }
+
+const MissionAccomplishedAudio: React.FC = () => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(25); // 25 seconds default
+  const [playbackRate, setPlaybackRate] = useState(1);
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const handlePlayPause = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+      } else {
+        audioRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
+  const handleProgressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newTime = (parseInt(e.target.value) / 100) * duration;
+    setCurrentTime(newTime);
+    if (audioRef.current) {
+      audioRef.current.currentTime = newTime;
+    }
+  };
+
+  const handleSpeedChange = (speed: number) => {
+    setPlaybackRate(speed);
+    if (audioRef.current) {
+      audioRef.current.playbackRate = speed;
+    }
+  };
+
+  const jumpTime = (seconds: number) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = Math.max(0, Math.min(duration, audioRef.current.currentTime + seconds));
+    }
+  };
+
+  return (
+    <div className="bg-black border-2 border-green-500 p-6 rounded-lg w-full max-w-2xl mx-auto mb-8">
+      <h3 className="text-green-400 text-xl font-bold text-center mb-4">CLASSIFIED TRANSMISSION</h3>
+      
+      {/* Progress Bar */}
+      <div className="mb-4">
+        <input
+          type="range"
+          min="0"
+          max="100"
+          value={(currentTime / duration) * 100}
+          onChange={handleProgressChange}
+          className="w-full h-2 bg-green-800 rounded-lg appearance-none slider"
+          style={{
+            background: `linear-gradient(to right, #22c55e 0%, #22c55e ${(currentTime/duration)*100}%, #166534 ${(currentTime/duration)*100}%, #166534 100%)`
+          }}
+        />
+      </div>
+
+      {/* Time Display */}
+      <div className="text-green-400 text-center text-lg font-mono mb-4">
+        {formatTime(currentTime)} / {formatTime(duration)}
+      </div>
+
+      {/* Control Buttons */}
+      <div className="flex justify-center gap-2 mb-4">
+        <button
+          onClick={() => jumpTime(-10)}
+          className="bg-black border border-green-500 text-green-400 px-3 py-1 rounded font-mono hover:bg-green-900"
+        >
+          [&lt;&lt;10s]
+        </button>
+        
+        <button
+          onClick={handlePlayPause}
+          className="bg-green-600 text-black px-6 py-1 rounded font-mono font-bold hover:bg-green-500"
+        >
+          {isPlaying ? '[PAUSE]' : '[PLAY]'}
+        </button>
+        
+        <button
+          onClick={() => jumpTime(10)}
+          className="bg-black border border-green-500 text-green-400 px-3 py-1 rounded font-mono hover:bg-green-900"
+        >
+          [10s&gt;&gt;]
+        </button>
+        
+        <button
+          onClick={() => {setCurrentTime(0); if(audioRef.current) audioRef.current.currentTime = 0;}}
+          className="bg-black border border-yellow-500 text-yellow-400 px-3 py-1 rounded font-mono hover:bg-yellow-900"
+        >
+          [REPLAY]
+        </button>
+      </div>
+
+      {/* Speed Control */}
+      <div className="text-center">
+        <button
+          onClick={() => handleSpeedChange(playbackRate === 1 ? 1.5 : 1)}
+          className="bg-black border border-yellow-500 text-yellow-400 px-4 py-1 rounded font-mono hover:bg-yellow-900"
+        >
+          [{playbackRate}x]
+        </button>
+      </div>
+
+      {/* Hidden Audio Element */}
+      <audio
+        ref={audioRef}
+        onTimeUpdate={() => setCurrentTime(audioRef.current?.currentTime || 0)}
+        onLoadedMetadata={() => setDuration(audioRef.current?.duration || 25)}
+        onEnded={() => setIsPlaying(false)}
+        preload="metadata"
+      >
+        <source src="https://epukqhdfdoxvowyflral.supabase.co/storage/v1/object/public/audio-files/mission-accomplished.mp3" type="audio/mpeg" />
+        Your browser does not support the audio element.
+      </audio>
+    </div>
+  );
+};
 
 const FinalScoreDisplay: React.FC<FinalScoreDisplayProps> = ({ 
   totalScore,
@@ -64,8 +188,11 @@ const FinalScoreDisplay: React.FC<FinalScoreDisplayProps> = ({
   }, []);
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-black text-green-400">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-black text-green-400">
       <div className="max-w-2xl w-full space-y-6">
+        {/* Mission Accomplished Audio Player */}
+        <MissionAccomplishedAudio />
+
         {/* Agent Rank Display */}
         <div className="text-center mb-8">
           <div 
@@ -181,14 +308,6 @@ const FinalScoreDisplay: React.FC<FinalScoreDisplayProps> = ({
             <p className="text-green-400 mb-6">
               CONGRATULATIONS ON YOUR GRADUATION!
             </p>
-            
-            {/* Audio Player */}
-            <div className="mb-6">
-              <audio controls className="w-full bg-black border border-green-400">
-                <source src="https://epukqhdfdoxvowyflral.supabase.co/storage/v1/object/public/audio-files/mission-accomplished.mp3" type="audio/mpeg" />
-                Your browser does not support the audio element.
-              </audio>
-            </div>
             
             <div className="space-y-4">
               <button 
