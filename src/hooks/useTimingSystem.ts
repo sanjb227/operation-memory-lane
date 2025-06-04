@@ -40,7 +40,7 @@ export const useTimingSystem = (sessionId: string, currentCheckpoint: number) =>
     let interval: number;
     
     if (isRunning && startTime) {
-      interval = setInterval(() => {
+      interval = window.setInterval(() => {
         const now = new Date();
         const elapsed = Math.floor((now.getTime() - startTime.getTime()) / 1000);
         setElapsedTime(elapsed);
@@ -48,7 +48,7 @@ export const useTimingSystem = (sessionId: string, currentCheckpoint: number) =>
     }
 
     return () => {
-      if (interval) clearInterval(interval);
+      if (interval) window.clearInterval(interval);
     };
   }, [isRunning, startTime]);
 

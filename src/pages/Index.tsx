@@ -224,7 +224,7 @@ const Index = () => {
     }, 2000);
   };
 
-  const handleUseLifeline = async () => {
+  const handleUseLifeline = async (): Promise<boolean> => {
     if (lifelinesRemaining > 0) {
       const newLifelines = lifelinesRemaining - 1;
       setLifelinesRemaining(newLifelines);
