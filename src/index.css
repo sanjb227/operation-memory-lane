@@ -1,4 +1,4 @@
-
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -678,4 +678,149 @@ input[type="text"], input[type="password"], textarea {
 /* Ensure content doesn't overlap with fixed bottom elements */
 .min-h-screen {
     padding-bottom: max(80px, env(safe-area-inset-bottom)) !important;
+}
+
+/* Score popup animations */
+.score-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  font-size: 24px;
+  font-weight: bold;
+  animation: scorePopup 3s ease-out forwards;
+  padding: 15px 25px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.9);
+  border: 2px solid #00ff41;
+  color: #00ff41;
+  font-family: monospace;
+  max-width: 90vw;
+  text-align: center;
+}
+
+.score-positive { 
+  color: #00ff41; 
+}
+
+.score-negative { 
+  color: #ff4444; 
+}
+
+.score-neutral { 
+  color: #ffff00; 
+}
+
+.invalid-attempt-popup {
+  position: fixed;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  font-size: 18px;
+  font-weight: bold;
+  color: #ff4444;
+  background: rgba(139, 0, 0, 0.9);
+  padding: 15px 25px;
+  border-radius: 8px;
+  border: 2px solid #ff4444;
+  animation: invalidAttemptShake 1.5s ease-out forwards;
+  font-family: monospace;
+  text-align: center;
+  max-width: 90vw;
+}
+
+@keyframes scorePopup {
+  0% { 
+    opacity: 0; 
+    transform: translate(-50%, -50%) scale(0.5); 
+  }
+  15% { 
+    opacity: 1; 
+    transform: translate(-50%, -50%) scale(1.2); 
+  }
+  25% { 
+    opacity: 1; 
+    transform: translate(-50%, -50%) scale(1.0); 
+  }
+  85% { 
+    opacity: 1; 
+    transform: translate(-50%, -50%) scale(1.0); 
+  }
+  100% { 
+    opacity: 0; 
+    transform: translate(-50%, -50%) scale(0.8); 
+  }
+}
+
+@keyframes invalidAttemptShake {
+  0%, 100% { 
+    transform: translate(-50%, -50%) translateX(0);
+    opacity: 1;
+  }
+  10%, 30%, 50%, 70%, 90% { 
+    transform: translate(-50%, -50%) translateX(-8px); 
+  }
+  20%, 40%, 60%, 80% { 
+    transform: translate(-50%, -50%) translateX(8px); 
+  }
+  95% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Timer display styles */
+.timer-display {
+  font-family: 'Courier New', monospace;
+  text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+}
+
+/* Mobile optimizations for iPhone X */
+@supports (padding: max(0px)) {
+  .timer-display {
+    top: max(1rem, env(safe-area-inset-top));
+    right: max(1rem, env(safe-area-inset-right));
+  }
+  
+  .score-popup,
+  .invalid-attempt-popup {
+    padding-left: max(15px, env(safe-area-inset-left));
+    padding-right: max(15px, env(safe-area-inset-right));
+  }
+}
+
+/* Responsive text sizing for mobile */
+@media (max-width: 768px) {
+  .score-popup {
+    font-size: 18px;
+    padding: 12px 20px;
+    max-width: 85vw;
+  }
+  
+  .invalid-attempt-popup {
+    font-size: 16px;
+    padding: 12px 20px;
+    max-width: 85vw;
+  }
+  
+  .timer-display {
+    font-size: 12px;
+  }
+}
+
+/* Enhanced mobile support for very small screens */
+@media (max-width: 375px) {
+  .score-popup {
+    font-size: 16px;
+    padding: 10px 15px;
+  }
+  
+  .invalid-attempt-popup {
+    font-size: 14px;
+    padding: 10px 15px;
+  }
 }

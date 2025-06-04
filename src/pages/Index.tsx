@@ -7,8 +7,13 @@ import PreFinalCheckpointModal from '../components/PreFinalCheckpointModal';
 import MissionAccomplished from '../components/MissionAccomplished';
 import MysteriousLanding from '../components/MysteriousLanding';
 import SystemMessages from '../components/SystemMessages';
+import TimerDisplay from '../components/TimerDisplay';
+import ScorePopup from '../components/ScorePopup';
+import InvalidAttemptPopup from '../components/InvalidAttemptPopup';
+import FinalScoreDisplay from '../components/FinalScoreDisplay';
 import { GamePhase } from '../types/game';
 import { useGameProgress } from '../hooks/useGameProgress';
+import { useTimingSystem } from '../hooks/useTimingSystem';
 
 const correctCodes = [
   "BAGGAGE CLAIMED",  // Checkpoint 1 - Bag
@@ -32,8 +37,21 @@ const Index = () => {
   const [showPreFinalModal, setShowPreFinalModal] = useState(false);
   const [progressLoaded, setProgressLoaded] = useState(false);
   const [showMysteriousLanding, setShowMysteriousLanding] = useState(true);
+  const [scorePopupData, setScorePopupData] = useState<any>(null);
+  const [showInvalidAttempt, setShowInvalidAttempt] = useState(false);
+  const [showFinalScore, setShowFinalScore] = useState(false);
 
   const { sessionId, isLoading, saveProgress, loadProgress } = useGameProgress();
+  const {
+    elapsedTime,
+    formatTime,
+    isRunning,
+    invalidAttempts,
+    startCheckpointTimer,
+    validateCode,
+    completeCheckpoint,
+    recordLifelineUse
+  } = useTimingSystem(sessionId || '', currentCheckpoint);
 
   // Load saved progress on component mount (only once)
   useEffect(() => {
@@ -52,7 +70,7 @@ const Index = () => {
         setShowMysteriousLanding(false);
         
         if (savedProgress.current_checkpoint >= correctCodes.length) {
-          setCurrentPhase('final');
+          setShowFinalScore(true);
         } else if (savedProgress.current_checkpoint > 0) {
           setCurrentPhase('clue');
         } else {
@@ -68,6 +86,13 @@ const Index = () => {
 
     initializeProgress();
   }, [isLoading, loadProgress, progressLoaded]);
+
+  // Start timer when entering clue phase
+  useEffect(() => {
+    if (currentPhase === 'clue' && sessionId && progressLoaded) {
+      startCheckpointTimer(currentCheckpoint);
+    }
+  }, [currentPhase, currentCheckpoint, sessionId, progressLoaded, startCheckpointTimer]);
 
   // Monitor phase changes for debugging
   useEffect(() => {
@@ -140,58 +165,72 @@ const Index = () => {
     setCurrentPhase('welcome');
   };
 
-  const handleCodeSubmit = (code: string) => {
+  const handleCodeSubmit = async (code: string) => {
     const trimmedCode = code.trim().toUpperCase();
-    const correctCode = correctCodes[currentCheckpoint].toUpperCase();
     
-    console.log('Code submitted:', trimmedCode, 'Expected:', correctCode);
+    console.log('Code submitted:', trimmedCode, 'Expected:', correctCodes[currentCheckpoint]);
     
-    if (trimmedCode === correctCode) {
-      const newEnteredCodes = [...enteredCodes, trimmedCode];
-      setEnteredCodes(newEnteredCodes);
-      setShowSuccess(true);
-      setShowError(false);
-      
-      setTimeout(() => {
-        setShowSuccess(false);
-        if (currentCheckpoint < correctCodes.length - 1) {
-          const nextCheckpoint = currentCheckpoint + 1;
-          
-          if (nextCheckpoint === 6) {
-            setShowCheckpoint7Handler(true);
-            if (sessionId && progressLoaded) {
-              saveProgress(nextCheckpoint, lifelinesRemaining, newEnteredCodes);
-            }
-          }
-          else if (nextCheckpoint === 7) {
-            setShowPreFinalModal(true);
-            if (sessionId && progressLoaded) {
-              saveProgress(nextCheckpoint, lifelinesRemaining, newEnteredCodes);
-            }
-          } else {
-            setCurrentCheckpoint(nextCheckpoint);
-            if (sessionId && progressLoaded) {
-              saveProgress(nextCheckpoint, lifelinesRemaining, newEnteredCodes);
-            }
-          }
-        } else {
-          setCurrentPhase('final');
-          if (sessionId && progressLoaded) {
-            saveProgress(correctCodes.length, lifelinesRemaining, newEnteredCodes);
-          }
-        }
-      }, 2000);
-    } else {
+    // Validate code with timing system
+    const validation = await validateCode(trimmedCode, correctCodes, currentCheckpoint);
+    
+    if (!validation.isValid) {
+      setShowInvalidAttempt(true);
       setShowError(true);
       setShowSuccess(false);
       setTimeout(() => setShowError(false), 3000);
+      return;
     }
+    
+    // Code is correct
+    const newEnteredCodes = [...enteredCodes, trimmedCode];
+    setEnteredCodes(newEnteredCodes);
+    setShowSuccess(true);
+    setShowError(false);
+    
+    // Complete checkpoint and get score
+    const scoreData = await completeCheckpoint(currentCheckpoint, 3 - lifelinesRemaining);
+    if (scoreData) {
+      setScorePopupData(scoreData);
+    }
+    
+    setTimeout(() => {
+      setShowSuccess(false);
+      if (currentCheckpoint < correctCodes.length - 1) {
+        const nextCheckpoint = currentCheckpoint + 1;
+        
+        if (nextCheckpoint === 6) {
+          setShowCheckpoint7Handler(true);
+          if (sessionId && progressLoaded) {
+            saveProgress(nextCheckpoint, lifelinesRemaining, newEnteredCodes);
+          }
+        }
+        else if (nextCheckpoint === 7) {
+          setShowPreFinalModal(true);
+          if (sessionId && progressLoaded) {
+            saveProgress(nextCheckpoint, lifelinesRemaining, newEnteredCodes);
+          }
+        } else {
+          setCurrentCheckpoint(nextCheckpoint);
+          if (sessionId && progressLoaded) {
+            saveProgress(nextCheckpoint, lifelinesRemaining, newEnteredCodes);
+          }
+        }
+      } else {
+        setShowFinalScore(true);
+        if (sessionId && progressLoaded) {
+          saveProgress(correctCodes.length, lifelinesRemaining, newEnteredCodes);
+        }
+      }
+    }, 2000);
   };
 
-  const handleUseLifeline = () => {
+  const handleUseLifeline = async () => {
     if (lifelinesRemaining > 0) {
       const newLifelines = lifelinesRemaining - 1;
       setLifelinesRemaining(newLifelines);
+      
+      // Record lifeline use in timing system
+      await recordLifelineUse(currentCheckpoint);
       
       if (sessionId && progressLoaded) {
         saveProgress(currentCheckpoint, newLifelines, enteredCodes);
@@ -214,6 +253,30 @@ const Index = () => {
     setCurrentCheckpoint(7);
   };
 
+  const handleStartOver = () => {
+    // Clear all stored progress and session data
+    localStorage.removeItem('treasure_hunt_session');
+    localStorage.clear();
+    
+    // Reset all state
+    setCurrentCheckpoint(0);
+    setLifelinesRemaining(3);
+    setEnteredCodes([]);
+    setCurrentPhase('welcome');
+    setShowError(false);
+    setShowSuccess(false);
+    setShowCheckpoint7Handler(false);
+    setShowPreFinalModal(false);
+    setProgressLoaded(false);
+    setShowMysteriousLanding(true);
+    setScorePopupData(null);
+    setShowInvalidAttempt(false);
+    setShowFinalScore(false);
+    
+    // Force a complete page reload
+    window.location.replace('/');
+  };
+
   // Show loading while progress is being loaded
   if (isLoading || !progressLoaded) {
     return (
@@ -230,6 +293,11 @@ const Index = () => {
     );
   }
 
+  // Show final score page
+  if (showFinalScore) {
+    return <FinalScoreDisplay sessionId={sessionId || ''} onStartOver={handleStartOver} />;
+  }
+
   // Show mysterious landing for new users
   if (showMysteriousLanding) {
     return <MysteriousLanding onProceed={handleMysteriousLanding} />;
@@ -237,6 +305,15 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-black text-green-400 font-mono overflow-hidden">
+      {/* Timer Display */}
+      <TimerDisplay elapsedTime={elapsedTime} formatTime={formatTime} isRunning={isRunning} />
+
+      {/* Score Popup */}
+      <ScorePopup score={scorePopupData} onClose={() => setScorePopupData(null)} />
+
+      {/* Invalid Attempt Popup */}
+      <InvalidAttemptPopup show={showInvalidAttempt} onClose={() => setShowInvalidAttempt(false)} />
+
       {/* UCL Logo Watermark */}
       <div className="fixed top-4 right-4 opacity-20 text-green-600 text-sm font-bold z-10">
         UCL
