@@ -224,15 +224,14 @@ const Index = () => {
     }, 2000);
   };
 
-  const handleUseLifeline = async (): Promise<boolean> => {
+  const handleUseLifeline = (): boolean => {
     if (lifelinesRemaining > 0) {
       const newLifelines = lifelinesRemaining - 1;
       setLifelinesRemaining(newLifelines);
       
-      // Record lifeline use in timing system
-      await recordLifelineUse(currentCheckpoint);
-      
+      // Record lifeline use in background
       if (sessionId && progressLoaded) {
+        recordLifelineUse(currentCheckpoint);
         saveProgress(currentCheckpoint, newLifelines, enteredCodes);
       }
       
