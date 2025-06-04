@@ -1,5 +1,4 @@
 
-
 import React, { useState } from 'react';
 import { getClueText, getLifelineText } from '../utils/clueData';
 
@@ -38,7 +37,7 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Enhanced mobile detection for Checkpoint 3 (Science Library) with iPhone X optimization
+  // Enhanced mobile detection for Checkpoint 5 (Science Library) with iPhone X optimization
   const isMobileDevice = () => {
     return (
       window.innerWidth < 1024 ||
@@ -50,8 +49,8 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Special handling for Checkpoint 3 (Science Library) - block mobile password entry
-    if (currentCheckpoint === 2 && isMobileDevice()) {
+    // Special handling for Checkpoint 5 (Science Library) - block mobile password entry
+    if (currentCheckpoint === 4 && isMobileDevice()) {
       // Show mobile blocked message with iPhone X optimization
       const feedback = document.createElement('div');
       feedback.textContent = '🖥️ DESKTOP ACCESS REQUIRED - This checkpoint must be completed on a desktop computer for security protocols';
@@ -103,7 +102,6 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
       navigator.clipboard.writeText(text).then(() => {
         showCopyFeedback();
       }).catch(() => {
-        // Fallback for older iOS versions
         fallbackCopyToClipboard(text);
       });
     } else {
@@ -154,7 +152,7 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
 
   const clueText = getClueText(currentCheckpoint);
   const isSecondToLast = currentCheckpoint === totalCheckpoints - 2;
-  const isCheckpoint3ScienceLibrary = currentCheckpoint === 2; // Science Library at position 2 (0-indexed)
+  const isCheckpoint5ScienceLibrary = currentCheckpoint === 4; // Science Library at position 4 (0-indexed)
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4" style={{ 
@@ -163,7 +161,7 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
       paddingLeft: `max(1rem, env(safe-area-inset-left))`,
       paddingRight: `max(1rem, env(safe-area-inset-right))`
     }}>
-      <div className="max-w-md w-full space-y-6">
+      <div className="max-w-md w-full space-y-4">
         {/* Help Button - iPhone X optimized positioning */}
         <div className="absolute top-4 left-4" style={{
           top: `max(1rem, env(safe-area-inset-top))`,
@@ -178,8 +176,8 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
           </button>
         </div>
 
-        {/* Desktop Hint for Checkpoint 3 (Science Library) Only */}
-        {isCheckpoint3ScienceLibrary && isDesktop && (
+        {/* Desktop Hint for Checkpoint 5 (Science Library) Only */}
+        {isCheckpoint5ScienceLibrary && isDesktop && (
           <div className="desktop-hint">
             <div className="text-xs font-bold mb-1">DESKTOP ACCESS GRANTED</div>
             <div className="text-xs">PASSWORD: SCI SPY</div>
@@ -201,7 +199,6 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
               <div className="text-xs leading-relaxed text-green-400 space-y-2">
                 <p>Seriously? You Need Help Already, Agent?</p>
                 <p>You'll receive a clue at each step—the first clue is given to you directly.</p>
-                <p>Each clue is based on an inside joke or shared memory.</p>
                 <p>Most clues are hidden in a small envelope at the location (unless the clue is digital).</p>
                 <p>Inside the envelope, you'll find a password.</p>
                 <p>Enter the password on the site to unlock your next clue and discover your next location.</p>
@@ -302,7 +299,7 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
         )}
 
         {/* Progress Indicator */}
-        <div className="text-center text-green-300">
+        <div className="text-center text-green-300 mb-4">
           <div className="text-sm font-bold">
             CHECKPOINT {currentCheckpoint + 1} OF {totalCheckpoints}
           </div>
@@ -312,7 +309,7 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
         </div>
 
         {/* Clue Display */}
-        <div className="border border-green-400 p-6 bg-black/90">
+        <div className="border border-green-400 p-6 bg-black/90 mb-6">
           <div className="text-green-300 font-bold mb-4 text-center">
             {isSecondToLast ? "FINAL TRANSMISSION" : "ENCRYPTED MESSAGE"}
           </div>
@@ -323,16 +320,16 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
         </div>
 
         {/* Code Input - Always show for all checkpoints with iPhone X optimization */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 mb-6">
           <div className="border border-green-400 p-4 bg-black/90">
-            <label className="block text-xs font-bold mb-2 text-green-300">
+            <label className="block text-xs font-bold mb-3 text-green-300">
               ENTER CODE:
             </label>
             <input
               type="text"
               value={inputCode}
               onChange={(e) => setInputCode(e.target.value.toUpperCase())}
-              className="w-full bg-black border border-green-600 text-green-400 px-3 py-3 text-sm font-mono focus:outline-none focus:border-green-300"
+              className="w-full bg-black border border-green-600 text-green-400 px-3 py-3 text-sm font-mono focus:outline-none focus:border-green-300 mb-4"
               placeholder="TYPE CODE HERE..."
               maxLength={20}
               style={{ 
@@ -349,7 +346,7 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
           
           <button
             type="submit"
-            className="w-full bg-green-600 hover:bg-green-500 text-black font-bold py-3 px-4 transition-colors duration-200 border border-green-400 disabled:opacity-50"
+            className="w-full bg-green-600 hover:bg-green-500 text-black font-bold py-3 px-4 transition-colors duration-200 border border-green-400 disabled:opacity-50 mb-4"
             disabled={!inputCode.trim()}
             style={{ 
               minHeight: '52px', 
@@ -364,7 +361,7 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
         {/* Lifeline Button - iPhone X optimized */}
         <button
           onClick={handleLifelineClick}
-          className={`w-full py-3 px-4 border text-sm transition-colors duration-200 ${
+          className={`w-full py-3 px-4 border text-sm transition-colors duration-200 mb-4 ${
             lifelinesRemaining > 0
               ? 'border-red-400 text-red-400 hover:bg-red-400 hover:text-black'
               : 'border-gray-600 text-gray-600 cursor-not-allowed'
@@ -382,7 +379,7 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
         {/* Clue Missing Support Button - iPhone X optimized */}
         <button
           onClick={handleClueSupportClick}
-          className="w-full py-3 px-4 border border-orange-400 text-orange-400 hover:bg-orange-400 hover:text-black text-sm transition-colors duration-200"
+          className="w-full py-3 px-4 border border-orange-400 text-orange-400 hover:bg-orange-400 hover:text-black text-sm transition-colors duration-200 mb-6"
           style={{ 
             minHeight: '52px', 
             touchAction: 'manipulation',
@@ -394,7 +391,7 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
 
         {/* Status Messages */}
         {showError && (
-          <div className="border border-red-500 bg-red-900/20 p-3 text-center">
+          <div className="border border-red-500 bg-red-900/20 p-3 text-center mb-4">
             <div className="text-red-400 text-sm font-bold">
               ACCESS DENIED - INVALID CODE
             </div>
@@ -402,18 +399,12 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
         )}
 
         {showSuccess && (
-          <div className="border border-green-400 bg-green-900/20 p-3 text-center">
+          <div className="border border-green-400 bg-green-900/20 p-3 text-center mb-4">
             <div className="text-green-300 text-sm font-bold">
               CODE ACCEPTED - ADVANCING TO NEXT CHECKPOINT
             </div>
           </div>
         )}
-
-        <div className="text-center text-xs opacity-40" style={{ 
-          paddingBottom: `max(10px, env(safe-area-inset-bottom))`
-        }}>
-          SECURE CONNECTION ESTABLISHED
-        </div>
       </div>
     </div>
   );

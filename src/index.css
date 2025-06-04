@@ -124,18 +124,18 @@
 /* iPhone X Optimized Mobile-First Responsive Design Framework */
 .page-container {
     max-width: 100vw;
-    padding: 15px;
+    padding: 20px;
     margin: 0 auto;
     box-sizing: border-box;
-    /* iPhone X Safe Area */
-    padding-top: max(15px, env(safe-area-inset-top));
-    padding-bottom: max(15px, env(safe-area-inset-bottom));
+    /* iPhone X Safe Area with increased spacing */
+    padding-top: max(20px, env(safe-area-inset-top));
+    padding-bottom: max(80px, env(safe-area-inset-bottom)); /* Increased bottom padding */
 }
 
 .terminal-box {
     border: 1px solid #00ff00;
-    padding: 15px;
-    margin: 10px 0;
+    padding: 20px;
+    margin: 15px 0;
     background: rgba(0, 0, 0, 0.8);
     max-width: 100%;
     overflow: visible;
@@ -143,92 +143,91 @@
 
 .button-row {
     display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
+    flex-direction: column;
+    gap: 15px;
     justify-content: center;
-    margin: 15px 0;
-    /* iPhone X Touch Target Optimization */
-    padding-bottom: max(15px, env(safe-area-inset-bottom));
+    margin: 20px 0;
+    /* iPhone X Touch Target Optimization with increased spacing */
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
 }
 
 .button-row button {
-    flex: 1;
-    min-width: 120px;
-    max-width: 160px;
-    padding: 12px 16px;
-    font-size: 14px;
+    width: 100%;
+    padding: 15px 20px;
+    font-size: 16px;
     /* iPhone X Touch Target - Minimum 44px height */
-    min-height: 44px;
+    min-height: 52px;
     /* Better touch interaction */
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     user-select: none;
+    margin-bottom: 10px;
 }
 
 /* Mission Header iPhone X Optimized */
 .mission-header {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    padding: 15px;
+    gap: 16px;
+    padding: 20px;
     flex-wrap: wrap;
     overflow: visible;
     /* Safe area for iPhone X notch */
-    padding-top: max(15px, env(safe-area-inset-top));
+    padding-top: max(20px, env(safe-area-inset-top));
 }
 
 .agent-info-bar {
-    font-size: 11px;
-    line-height: 1.3;
+    font-size: 12px;
+    line-height: 1.4;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    min-height: 18px;
+    min-height: 20px;
 }
 
 /* Success Page iPhone X Optimized */
 .success-container {
-    padding: 25px 20px;
-    margin: 10px;
+    padding: 30px 25px;
+    margin: 15px;
     box-sizing: border-box;
-    max-width: calc(100vw - 20px);
+    max-width: calc(100vw - 30px);
     overflow: visible;
-    /* iPhone X bottom safe area */
-    padding-bottom: max(25px, env(safe-area-inset-bottom));
+    /* iPhone X bottom safe area with increased spacing */
+    padding-bottom: max(30px, env(safe-area-inset-bottom));
 }
 
 .success-title {
-    font-size: clamp(28px, 8vw, 48px);
+    font-size: clamp(32px, 8vw, 52px);
     line-height: 1.2;
-    margin-bottom: 25px;
+    margin-bottom: 30px;
     word-wrap: break-word;
 }
 
 .success-message {
-    font-size: clamp(16px, 4vw, 20px);
-    line-height: 1.4;
-    margin: 20px 0;
+    font-size: clamp(18px, 4vw, 22px);
+    line-height: 1.5;
+    margin: 25px 0;
 }
 
 /* Audio Player iPhone X Optimization */
 .audio-container {
     width: 100%;
     max-width: 100%;
-    padding: 20px;
+    padding: 25px;
     box-sizing: border-box;
 }
 
 .audio-controls {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    gap: 12px;
-    margin: 20px 0;
+    gap: 15px;
+    margin: 25px 0;
 }
 
 .audio-progress-bar {
     width: 100%;
-    height: 10px;
-    margin: 15px 0;
+    height: 12px;
+    margin: 18px 0;
     cursor: pointer;
     /* iPhone X Touch optimization */
     touch-action: manipulation;
@@ -245,48 +244,48 @@ h1, h2, h3, p, div {
 /* iPhone X Specific Breakpoints */
 @media (max-width: 768px) {
     .agent-info-bar {
-        font-size: 10px;
+        font-size: 11px;
         display: block;
         white-space: normal;
         word-wrap: break-word;
     }
     
     .mission-title {
-        font-size: 20px;
-        margin: 15px 0;
+        font-size: 22px;
+        margin: 18px 0;
     }
     
     .audio-controls {
         grid-template-columns: 1fr 1fr;
-        gap: 10px;
+        gap: 12px;
     }
     
     .audio-controls button {
-        font-size: 12px;
-        padding: 8px 12px;
-        min-height: 44px; /* iPhone X touch target */
+        font-size: 14px;
+        padding: 10px 15px;
+        min-height: 48px; /* iPhone X touch target */
     }
 }
 
-/* iPhone X Portrait Mode (375px width) */
+/* iPhone X Portrait Mode (375px width) with improved spacing */
 @media (max-width: 480px) {
     .success-container {
-        padding: 20px 15px;
-        margin: 8px;
-        padding-bottom: max(20px, env(safe-area-inset-bottom));
+        padding: 25px 20px;
+        margin: 10px;
+        padding-bottom: max(25px, env(safe-area-inset-bottom));
     }
     
     .button-row {
         flex-direction: column;
         align-items: center;
-        gap: 12px;
+        gap: 15px;
     }
     
     .button-row button {
-        width: 85%;
-        max-width: 280px;
-        margin: 6px 0;
-        min-height: 48px; /* Slightly larger for iPhone X */
+        width: 100%;
+        max-width: 100%;
+        margin: 8px 0;
+        min-height: 52px; /* Larger for iPhone X */
     }
 
     /* iPhone X text optimization */
@@ -297,9 +296,15 @@ h1, h2, h3, p, div {
     input {
         font-size: 16px; /* Prevent zoom on iPhone X */
     }
+    
+    /* Increased spacing for mobile content */
+    .page-container {
+        padding: 25px 20px;
+        padding-bottom: max(100px, env(safe-area-inset-bottom));
+    }
 }
 
-/* Desktop hint for checkpoint 3 - Hidden on iPhone X, visible on desktop */
+/* Desktop hint for checkpoint 5 - Hidden on iPhone X, visible on desktop */
 .desktop-hint {
   display: none;
 }
@@ -333,7 +338,7 @@ button:disabled,
     color: #000 !important;
     border: 1px solid #22c55e !important;
     /* iPhone X touch optimization */
-    min-height: 44px !important;
+    min-height: 48px !important;
     touch-action: manipulation !important;
 }
 
@@ -347,7 +352,7 @@ button[class*="text-gray"] {
     background-color: #16a34a !important;
     color: #000 !important;
     border: 1px solid #22c55e !important;
-    min-height: 44px !important;
+    min-height: 48px !important;
     touch-action: manipulation !important;
 }
 
@@ -415,7 +420,7 @@ button[class*="text-gray"] {
     transition: all 0.2s ease;
     position: relative;
     overflow: hidden;
-    min-height: 44px;
+    min-height: 48px;
     touch-action: manipulation;
 }
 
@@ -483,7 +488,7 @@ body::before {
     position: relative;
     overflow: hidden;
     touch-action: manipulation;
-    min-height: 44px; /* iPhone X touch target */
+    min-height: 48px; /* iPhone X touch target */
     display: flex;
     align-items: center;
 }
@@ -502,19 +507,19 @@ body::before {
 /* Speed control buttons with iPhone X optimization */
 .speed-control {
     display: flex;
-    gap: 4px;
-    margin-top: 12px;
+    gap: 6px;
+    margin-top: 15px;
 }
 
 .speed-btn {
     background: rgba(0, 255, 0, 0.1);
     border: 1px solid #00ff00;
     color: #00ff00;
-    padding: 6px 10px;
-    font-size: 12px;
+    padding: 8px 12px;
+    font-size: 14px;
     cursor: pointer;
     transition: all 0.2s;
-    min-height: 44px; /* iPhone X touch target */
+    min-height: 48px; /* iPhone X touch target */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -536,7 +541,7 @@ body::before {
     text-align: center;
     width: 100%;
     max-width: 600px;
-    padding: 0 max(15px, env(safe-area-inset-left)) max(20px, env(safe-area-inset-bottom)) max(15px, env(safe-area-inset-right));
+    padding: 0 max(20px, env(safe-area-inset-left)) max(25px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-right));
 }
 
 .typewriter {
@@ -573,12 +578,12 @@ body::before {
     background: transparent;
     border: 1px solid #00ff00;
     color: #00ff00;
-    padding: 15px 30px;
+    padding: 18px 35px;
     font-family: monospace;
     cursor: pointer;
-    margin-top: 30px;
+    margin-top: 35px;
     transition: all 0.3s;
-    min-height: 48px; /* Larger for iPhone X */
+    min-height: 52px; /* Larger for iPhone X */
     touch-action: manipulation;
     font-size: 16px; /* Prevent zoom on iPhone X */
 }
@@ -593,13 +598,13 @@ body::before {
     background: rgba(0, 255, 0, 0.2) !important;
     border: 1px solid #00ff00 !important;
     color: #00ff00 !important;
-    padding: 12px 20px !important;
+    padding: 15px 25px !important;
     font-family: monospace !important;
-    font-size: 14px !important;
+    font-size: 16px !important;
     cursor: pointer !important;
-    margin-top: 25px !important;
+    margin-top: 30px !important;
     transition: all 0.2s !important;
-    min-height: 48px !important; /* iPhone X touch target */
+    min-height: 52px !important; /* iPhone X touch target */
     touch-action: manipulation !important;
 }
 
@@ -638,7 +643,7 @@ input[type="text"], input[type="password"], textarea {
     -webkit-user-select: all;
     -webkit-touch-callout: default;
     cursor: pointer;
-    padding: 4px;
+    padding: 6px;
 }
 
 /* iPhone X Portrait Lock Support */
@@ -659,4 +664,18 @@ input[type="text"], input[type="password"], textarea {
         text-align: center;
         padding: 20px;
     }
+}
+
+/* Fixed positioning for bottom mission timer */
+.fixed.bottom-4.left-4 {
+    position: fixed !important;
+    bottom: max(20px, env(safe-area-inset-bottom)) !important;
+    left: max(20px, env(safe-area-inset-left)) !important;
+    z-index: 10 !important;
+    pointer-events: none; /* Don't interfere with other elements */
+}
+
+/* Ensure content doesn't overlap with fixed bottom elements */
+.min-h-screen {
+    padding-bottom: max(80px, env(safe-area-inset-bottom)) !important;
 }

@@ -11,14 +11,14 @@ import { GamePhase } from '../types/game';
 import { useGameProgress } from '../hooks/useGameProgress';
 
 const correctCodes = [
-  "BAGGAGE CLAIMED",  // Checkpoint 1 (unchanged)
-  "TAP SECRET",       // Checkpoint 2 (unchanged)
-  "SCI SPY",          // Checkpoint 3 (moved from position 4)
-  "READ BETWEEN",     // Checkpoint 4 (moved from position 3)
-  "BUDDING GENIUS",   // Checkpoint 5 (unchanged)
-  "STAIRWAY SPY",     // Checkpoint 6 (moved from position 7)
-  "MUFFIN MISSION",   // Checkpoint 7 (moved from position 6)
-  "ARMCHAIR AGENT"    // Checkpoint 8 (unchanged)
+  "BAGGAGE CLAIMED",  // Checkpoint 1 - Bag
+  "STAIRWAY SPY",     // Checkpoint 2 - IOE Stairs
+  "READ BETWEEN",     // Checkpoint 3 - Waterstones
+  "TAP SECRET",       // Checkpoint 4 - Torrington Place 1-19
+  "SCI SPY",          // Checkpoint 5 - Science Library
+  "BUDDING GENIUS",   // Checkpoint 6 - Gordon Square Gardens
+  "MUFFIN MISSION",   // Checkpoint 7 - Print Room Cafe
+  "ARMCHAIR AGENT"    // Checkpoint 8 - Student Centre
 ];
 
 const Index = () => {
@@ -104,7 +104,6 @@ const Index = () => {
           document.body.appendChild(feedback);
           setTimeout(() => feedback.remove(), 1500);
 
-          // Call original handler if it exists
           if (existingHandler) {
             existingHandler.call(btn, e);
           }
@@ -158,14 +157,12 @@ const Index = () => {
         if (currentCheckpoint < correctCodes.length - 1) {
           const nextCheckpoint = currentCheckpoint + 1;
           
-          // Show checkpoint 7 handler before checkpoint 7 (index 6)
           if (nextCheckpoint === 6) {
             setShowCheckpoint7Handler(true);
             if (sessionId && progressLoaded) {
               saveProgress(nextCheckpoint, lifelinesRemaining, newEnteredCodes);
             }
           }
-          // Show pre-final modal before final checkpoint (index 7)
           else if (nextCheckpoint === 7) {
             setShowPreFinalModal(true);
             if (sessionId && progressLoaded) {
