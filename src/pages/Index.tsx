@@ -11,6 +11,7 @@ import TimerDisplay from '../components/TimerDisplay';
 import ScoreDisplay from '../components/ScoreDisplay';
 import FinalScoreDisplay from '../components/FinalScoreDisplay';
 import GameRecoveryModal from '../components/GameRecoveryModal';
+import AutoFadeNotification, { useNotifications } from '../components/AutoFadeNotification';
 import { GamePhase } from '../types/game';
 import { useGameState } from '../hooks/useGameState';
 
@@ -19,7 +20,7 @@ const correctCodes = [
   "STAIRWAY SPY",     // Checkpoint 2
   "READ BETWEEN",     // Checkpoint 3
   "TAP SECRET",       // Checkpoint 4
-  "SCI SPY",          // Checkpoint 5
+  "SCI SPY",          // Checkpoint 5 - now allowed on mobile
   "BUDDING GENIUS",   // Checkpoint 6
   "MUFFIN MISSION",   // Checkpoint 7
   "ARMCHAIR AGENT"    // Checkpoint 8
@@ -50,11 +51,11 @@ const Index = () => {
     recordInvalidAttempt,
     skipCheckpoint5,
     completeGame,
-    addNotification,
-    removeNotification,
     resetGame,
     persistGameState
   } = useGameState();
+
+  const { notifications, addNotification, removeNotification, clearAllNotifications } = useNotifications();
 
   // Initialize game and check for saved state
   useEffect(() => {
@@ -122,42 +123,9 @@ const Index = () => {
     const trimmedCode = code.trim().toUpperCase();
     const correctCode = correctCodes[gameState.currentCheckpoint];
     
-    // Special handling for checkpoint 5 mobile completion
-    if (trimmedCode === "CHECKPOINT5_MOBILE_COMPLETE" && gameState.currentCheckpoint === 4) {
-      const points = completeCheckpoint();
-      const newEnteredCodes = [...enteredCodes, "SCI SPY"]; // Use the actual code
-      setEnteredCodes(newEnteredCodes);
-      
-      setShowSuccessMessage(true);
-      addNotification(`+${points} points earned! (Mobile bypass)`, "success");
-      
-      setTimeout(() => {
-        setShowSuccessMessage(false);
-        
-        if (gameState.currentCheckpoint < correctCodes.length - 1) {
-          const nextCheckpoint = gameState.currentCheckpoint + 1;
-          
-          if (nextCheckpoint === 6) {
-            setShowCheckpoint7Handler(true);
-          } else if (nextCheckpoint === 7) {
-            setShowPreFinalModal(true);
-          } else {
-            startCheckpoint(nextCheckpoint);
-            setElapsedTime(0);
-          }
-        } else {
-          completeGame();
-          setIsTimerRunning(false);
-          setCurrentPhase('final');
-        }
-      }, 2000);
-      
-      return true;
-    }
-    
     if (trimmedCode !== correctCode) {
       recordInvalidAttempt();
-      addNotification("Invalid Code! -2 points", "error");
+      addNotification("Invalid Code! -2 points", "error", 2500);
       return false;
     }
     
@@ -167,7 +135,7 @@ const Index = () => {
     setEnteredCodes(newEnteredCodes);
     
     setShowSuccessMessage(true);
-    addNotification(`+${points} points earned!`, "success");
+    addNotification(`+${points} points earned!`, "success", 2500);
     
     setTimeout(() => {
       setShowSuccessMessage(false);
@@ -198,7 +166,7 @@ const Index = () => {
       const newLifelines = lifelinesRemaining - 1;
       setLifelinesRemaining(newLifelines);
       useLifeline();
-      addNotification("Lifeline used! -3 points", "lifeline");
+      addNotification("Lifeline used! -3 points", "warning", 2500);
       return true;
     }
     return false;
@@ -206,7 +174,7 @@ const Index = () => {
 
   const handleSkipCheckpoint5 = () => {
     skipCheckpoint5();
-    addNotification("Checkpoint 5 skipped! -5 points", "lifeline");
+    addNotification("Checkpoint 5 skipped! -5 points", "warning", 2500);
     
     setTimeout(() => {
       const nextCheckpoint = gameState.currentCheckpoint + 1;
@@ -238,12 +206,14 @@ const Index = () => {
     setShowSuccessMessage(false);
     setElapsedTime(0);
     setIsTimerRunning(false);
+    clearAllNotifications();
   };
 
   const handleResumeGame = () => {
     resumeGame();
     setLifelinesRemaining(3 - gameState.totalLifelinesUsed);
     setCurrentPhase('clue');
+    // Don't add the persistent "Game resumed" notification
   };
 
   const handleStartNewGameFromRecovery = () => {
@@ -257,6 +227,7 @@ const Index = () => {
     setShowSuccessMessage(false);
     setElapsedTime(0);
     setIsTimerRunning(false);
+    clearAllNotifications();
   };
 
   // Show game recovery modal
@@ -292,6 +263,12 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-black text-green-400 font-mono overflow-hidden">
+      {/* Notification System */}
+      <AutoFadeNotification 
+        notifications={notifications} 
+        onRemove={removeNotification} 
+      />
+
       {/* Timer Display */}
       <TimerDisplay elapsedTime={elapsedTime} formatTime={formatTime} isRunning={isTimerRunning} />
 
@@ -346,8 +323,6 @@ const Index = () => {
           totalCheckpoints={correctCodes.length}
           showSuccessMessage={showSuccessMessage}
           gameState={gameState}
-          notifications={gameState.notifications}
-          onRemoveNotification={removeNotification}
         />
       )}
     </div>

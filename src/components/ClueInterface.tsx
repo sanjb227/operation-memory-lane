@@ -1,8 +1,6 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { getClueText, getLifelineText } from '../utils/clueData';
-import AutoFadeNotification from './AutoFadeNotification';
-import Checkpoint5MobileHandler from './Checkpoint5MobileHandler';
-import { detectDevice } from '../utils/deviceDetection';
 
 interface ClueInterfaceProps {
   currentCheckpoint: number;
@@ -13,13 +11,6 @@ interface ClueInterfaceProps {
   totalCheckpoints: number;
   showSuccessMessage: boolean;
   gameState: any;
-  notifications: Array<{
-    id: number;
-    message: string;
-    type: 'error' | 'success' | 'info' | 'lifeline';
-    timestamp: number;
-  }>;
-  onRemoveNotification: (id: number) => void;
 }
 
 const ClueInterface: React.FC<ClueInterfaceProps> = ({
@@ -30,9 +21,7 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
   onSkipCheckpoint5,
   totalCheckpoints,
   showSuccessMessage,
-  gameState,
-  notifications,
-  onRemoveNotification
+  gameState
 }) => {
   const [inputCode, setInputCode] = useState('');
   const [lifelineData, setLifelineData] = useState<{ coordinates: string; briefing: string } | null>(null);
@@ -40,9 +29,6 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
   const [showHelp, setShowHelp] = useState(false);
   const [showClueSupport, setShowClueSupport] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  const device = detectDevice();
-  const isCheckpoint5Mobile = currentCheckpoint === 4 && (device.isMobile || device.isTablet); // Checkpoint 5 is index 4
 
   // Fix input focus and initialization
   useEffect(() => {
@@ -93,16 +79,6 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
       setLifelineData(lifeline);
       setShowLifeline(true);
     }
-  };
-
-  const handleSkipCheckpoint5 = () => {
-    onSkipCheckpoint5();
-  };
-
-  const handleContinueFromCheckpoint5 = () => {
-    // User claims they completed checkpoint 5 on desktop
-    // We'll trust them and advance to next checkpoint
-    onCodeSubmit("CHECKPOINT5_MOBILE_COMPLETE");
   };
 
   const clueText = getClueText(currentCheckpoint);
@@ -226,121 +202,98 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
           </div>
         </div>
 
-        {/* Checkpoint 5 Mobile Handler */}
-        {isCheckpoint5Mobile ? (
-          <Checkpoint5MobileHandler
-            gameState={gameState}
-            onSkip={handleSkipCheckpoint5}
-            onContinue={handleContinueFromCheckpoint5}
-          />
-        ) : (
-          <>
-            {/* Clue Display */}
-            <div className="border border-green-400 p-6 bg-black/90 mb-6">
-              <div className="text-green-300 font-bold mb-4 text-center">
-                {isSecondToLast ? "FINAL TRANSMISSION" : "ENCRYPTED MESSAGE"}
-              </div>
-              
-              <div className="text-sm leading-relaxed whitespace-pre-line">
-                {clueText}
-              </div>
+        {/* Clue Display */}
+        <div className="border border-green-400 p-6 bg-black/90 mb-6">
+          <div className="text-green-300 font-bold mb-4 text-center">
+            {isSecondToLast ? "FINAL TRANSMISSION" : "ENCRYPTED MESSAGE"}
+          </div>
+          
+          <div className="text-sm leading-relaxed whitespace-pre-line">
+            {clueText}
+          </div>
+        </div>
+
+        {/* Success Message */}
+        {showSuccessMessage && (
+          <div className="bg-green-900/20 border border-green-400 p-3 text-center mb-4">
+            <div className="text-green-300 text-sm font-bold">
+              ✓ CODE ACCEPTED - ADVANCING TO NEXT CHECKPOINT
             </div>
-
-            {/* Success Message */}
-            {showSuccessMessage && (
-              <div className="bg-green-900/20 border border-green-400 p-3 text-center mb-4">
-                <div className="text-green-300 text-sm font-bold">
-                  ✓ CODE ACCEPTED - ADVANCING TO NEXT CHECKPOINT
-                </div>
-              </div>
-            )}
-
-            {/* Code Input */}
-            <form onSubmit={handleSubmit} className="space-y-4 mb-6">
-              <div className="border border-green-400 p-4 bg-black/90">
-                <label className="block text-xs font-bold mb-3 text-green-300">
-                  ENTER CODE:
-                </label>
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={inputCode}
-                  onChange={(e) => setInputCode(e.target.value.toUpperCase())}
-                  className="w-full bg-black border-2 border-green-600 text-green-400 px-3 py-3 text-sm font-mono focus:outline-none focus:border-green-300 focus:ring-2 focus:ring-green-300/20 mb-4"
-                  placeholder="TYPE CODE HERE..."
-                  maxLength={20}
-                  style={{ 
-                    fontSize: '16px', 
-                    minHeight: '48px',
-                    touchAction: 'manipulation'
-                  }}
-                  autoComplete="off"
-                  autoCorrect="off"
-                  autoCapitalize="characters"
-                  spellCheck="false"
-                />
-              </div>
-              
-              <button
-                type="submit"
-                className="w-full bg-green-600 hover:bg-green-500 text-black font-bold py-3 px-4 transition-colors duration-200 border border-green-400 disabled:opacity-50 mb-4"
-                disabled={!inputCode.trim()}
-                style={{ 
-                  minHeight: '52px', 
-                  touchAction: 'manipulation',
-                  fontSize: '16px'
-                }}
-              >
-                [SUBMIT CODE]
-              </button>
-            </form>
-
-            {/* Lifeline Button */}
-            <button
-              onClick={handleLifelineClick}
-              className={`w-full py-3 px-4 border text-sm transition-colors duration-200 mb-4 ${
-                lifelinesRemaining > 0
-                  ? 'border-red-400 text-red-400 hover:bg-red-400 hover:text-black'
-                  : 'border-gray-600 text-gray-600 cursor-not-allowed'
-              }`}
-              disabled={lifelinesRemaining === 0}
-              style={{ 
-                minHeight: '52px', 
-                touchAction: 'manipulation',
-                fontSize: '16px'
-              }}
-            >
-              {lifelinesRemaining > 0 ? '[REQUEST LIFELINE] (-3 POINTS)' : '[NO LIFELINES REMAINING]'}
-            </button>
-
-            {/* Show lifeline again button */}
-            {lifelineData && !showLifeline && (
-              <button
-                onClick={() => setShowLifeline(true)}
-                className="w-full py-3 px-4 border border-orange-400 text-orange-400 hover:bg-orange-400 hover:text-black text-sm transition-colors duration-200 mb-4"
-                style={{ 
-                  minHeight: '52px', 
-                  touchAction: 'manipulation',
-                  fontSize: '16px'
-                }}
-              >
-                [VIEW LIFELINE AGAIN]
-              </button>
-            )}
-          </>
+          </div>
         )}
 
-        {/* Auto-fade Notifications */}
-        <div className="notifications-container">
-          {notifications.map(notification => (
-            <AutoFadeNotification
-              key={notification.id}
-              message={notification.message}
-              type={notification.type}
-              onComplete={() => onRemoveNotification(notification.id)}
+        {/* Code Input */}
+        <form onSubmit={handleSubmit} className="space-y-4 mb-6">
+          <div className="border border-green-400 p-4 bg-black/90">
+            <label className="block text-xs font-bold mb-3 text-green-300">
+              ENTER CODE:
+            </label>
+            <input
+              ref={inputRef}
+              type="text"
+              value={inputCode}
+              onChange={(e) => setInputCode(e.target.value.toUpperCase())}
+              className="w-full bg-black border-2 border-green-600 text-green-400 px-3 py-3 text-sm font-mono focus:outline-none focus:border-green-300 focus:ring-2 focus:ring-green-300/20 mb-4"
+              placeholder="TYPE CODE HERE..."
+              maxLength={20}
+              style={{ 
+                fontSize: '16px', 
+                minHeight: '48px',
+                touchAction: 'manipulation'
+              }}
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="characters"
+              spellCheck="false"
             />
-          ))}
-        </div>
+          </div>
+          
+          <button
+            type="submit"
+            className="w-full bg-green-600 hover:bg-green-500 text-black font-bold py-3 px-4 transition-colors duration-200 border border-green-400 disabled:opacity-50 mb-4"
+            disabled={!inputCode.trim()}
+            style={{ 
+              minHeight: '52px', 
+              touchAction: 'manipulation',
+              fontSize: '16px'
+            }}
+          >
+            [SUBMIT CODE]
+          </button>
+        </form>
+
+        {/* Lifeline Button */}
+        <button
+          onClick={handleLifelineClick}
+          className={`w-full py-3 px-4 border text-sm transition-colors duration-200 mb-4 ${
+            lifelinesRemaining > 0
+              ? 'border-red-400 text-red-400 hover:bg-red-400 hover:text-black'
+              : 'border-gray-600 text-gray-600 cursor-not-allowed'
+          }`}
+          disabled={lifelinesRemaining === 0}
+          style={{ 
+            minHeight: '52px', 
+            touchAction: 'manipulation',
+            fontSize: '16px'
+          }}
+        >
+          {lifelinesRemaining > 0 ? '[REQUEST LIFELINE] (-3 POINTS)' : '[NO LIFELINES REMAINING]'}
+        </button>
+
+        {/* Show lifeline again button */}
+        {lifelineData && !showLifeline && (
+          <button
+            onClick={() => setShowLifeline(true)}
+            className="w-full py-3 px-4 border border-orange-400 text-orange-400 hover:bg-orange-400 hover:text-black text-sm transition-colors duration-200 mb-4"
+            style={{ 
+              minHeight: '52px', 
+              touchAction: 'manipulation',
+              fontSize: '16px'
+            }}
+          >
+            [VIEW LIFELINE AGAIN]
+          </button>
+        )}
 
         {/* Clue Missing Support Button */}
         <button

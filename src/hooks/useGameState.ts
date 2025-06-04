@@ -12,12 +12,6 @@ interface GameState {
   checkpointTimes: number[];
   checkpointScores: number[];
   isGameComplete: boolean;
-  notifications: Array<{
-    id: number;
-    message: string;
-    type: 'error' | 'success' | 'info' | 'lifeline';
-    timestamp: number;
-  }>;
 }
 
 const initialState: GameState = {
@@ -29,8 +23,7 @@ const initialState: GameState = {
   totalInvalidAttempts: 0,
   checkpointTimes: [],
   checkpointScores: [],
-  isGameComplete: false,
-  notifications: []
+  isGameComplete: false
 };
 
 export const useGameState = () => {
@@ -91,10 +84,8 @@ export const useGameState = () => {
         totalInvalidAttempts: sharedSession.totalInvalidAttempts,
         checkpointTimes: sharedSession.checkpointTimes,
         checkpointScores: sharedSession.checkpointScores,
-        isGameComplete: sharedSession.isGameComplete,
-        notifications: []
+        isGameComplete: sharedSession.isGameComplete
       });
-      addNotification("Game resumed from shared session", "info");
       return;
     }
 
@@ -116,10 +107,8 @@ export const useGameState = () => {
         totalInvalidAttempts: savedState.totalInvalidAttempts,
         checkpointTimes: savedState.checkpointTimes,
         checkpointScores: savedState.checkpointScores,
-        isGameComplete: savedState.isGameComplete,
-        notifications: []
+        isGameComplete: savedState.isGameComplete
       });
-      addNotification("Game resumed from where you left off", "info");
     }
     setShowRecoveryModal(false);
   }, []);
@@ -194,27 +183,6 @@ export const useGameState = () => {
     persistGameState();
   }, [persistGameState]);
 
-  const addNotification = useCallback((message: string, type: 'error' | 'success' | 'info' | 'lifeline') => {
-    const notification = {
-      id: Date.now(),
-      message,
-      type,
-      timestamp: Date.now()
-    };
-    
-    setGameState(prev => ({
-      ...prev,
-      notifications: [...prev.notifications, notification]
-    }));
-  }, []);
-
-  const removeNotification = useCallback((id: number) => {
-    setGameState(prev => ({
-      ...prev,
-      notifications: prev.notifications.filter(n => n.id !== id)
-    }));
-  }, []);
-
   const resetGame = useCallback(() => {
     clearGameState();
     setGameState(initialState);
@@ -234,8 +202,6 @@ export const useGameState = () => {
     recordInvalidAttempt,
     skipCheckpoint5,
     completeGame,
-    addNotification,
-    removeNotification,
     resetGame,
     persistGameState
   };
