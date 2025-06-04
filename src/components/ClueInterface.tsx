@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { getClueText, getLifelineText } from '../utils/clueData';
 
@@ -28,7 +27,19 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
   const [showLifeline, setShowLifeline] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [showClueSupport, setShowClueSupport] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Desktop detection for checkpoint 5 code display
+  useEffect(() => {
+    const checkDevice = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+    
+    checkDevice();
+    window.addEventListener('resize', checkDevice);
+    return () => window.removeEventListener('resize', checkDevice);
+  }, []);
 
   // Fix input focus and initialization
   useEffect(() => {
@@ -86,6 +97,28 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 pt-20">
+      {/* Desktop Code Display for Checkpoint 5 */}
+      {currentCheckpoint === 4 && isDesktop && (
+        <div 
+          className="fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg font-mono text-lg border border-green-400 z-50"
+          style={{ 
+            position: 'fixed',
+            top: '20px',
+            right: '20px',
+            zIndex: 9999,
+            backgroundColor: '#16a34a',
+            color: 'white',
+            padding: '8px 16px',
+            borderRadius: '8px',
+            fontFamily: 'monospace',
+            fontSize: '18px',
+            border: '1px solid #22c55e'
+          }}
+        >
+          SCI SPY
+        </div>
+      )}
+
       <div className="max-w-md w-full space-y-4">
         {/* Help Button */}
         <div className="absolute top-20 left-4">
