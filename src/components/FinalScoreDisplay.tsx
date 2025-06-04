@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useRef } from 'react';
 
 interface FinalScoreDisplayProps {
@@ -14,6 +15,7 @@ const MissionAccomplishedAudio: React.FC = () => {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(25); // 25 seconds default
   const [playbackRate, setPlaybackRate] = useState(1);
+  const [hasAutoPlayed, setHasAutoPlayed] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const formatTime = (seconds: number) => {
@@ -21,6 +23,26 @@ const MissionAccomplishedAudio: React.FC = () => {
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
+
+  // Auto-play after 2 seconds (only once)
+  useEffect(() => {
+    if (!hasAutoPlayed) {
+      const autoPlayTimer = setTimeout(() => {
+        if (audioRef.current) {
+          audioRef.current.volume = 0.7;
+          audioRef.current.play().then(() => {
+            setIsPlaying(true);
+            setHasAutoPlayed(true);
+          }).catch(error => {
+            console.log('Audio autoplay blocked:', error);
+            setHasAutoPlayed(true);
+          });
+        }
+      }, 2000);
+
+      return () => clearTimeout(autoPlayTimer);
+    }
+  }, [hasAutoPlayed]);
 
   const handlePlayPause = () => {
     if (audioRef.current) {
@@ -125,6 +147,8 @@ const MissionAccomplishedAudio: React.FC = () => {
         onTimeUpdate={() => setCurrentTime(audioRef.current?.currentTime || 0)}
         onLoadedMetadata={() => setDuration(audioRef.current?.duration || 25)}
         onEnded={() => setIsPlaying(false)}
+        onPlay={() => setIsPlaying(true)}
+        onPause={() => setIsPlaying(false)}
         preload="metadata"
       >
         <source src="https://epukqhdfdoxvowyflral.supabase.co/storage/v1/object/public/audio-files/mission-accomplished.mp3" type="audio/mpeg" />
@@ -167,25 +191,6 @@ const FinalScoreDisplay: React.FC<FinalScoreDisplayProps> = ({
     const secs = Math.floor(seconds % 60);
     return `${minutes}:${secs.toString().padStart(2, '0')}`;
   };
-
-  // Auto-play final audio
-  useEffect(() => {
-    const playFinalAudio = () => {
-      try {
-        const audioUrl = "https://epukqhdfdoxvowyflral.supabase.co/storage/v1/object/public/audio-files/mission-accomplished.mp3";
-        const audio = new Audio(audioUrl);
-        audio.volume = 0.7;
-        audio.play().catch(error => {
-          console.log('Audio autoplay blocked:', error);
-        });
-      } catch (error) {
-        console.error('Error playing final audio:', error);
-      }
-    };
-
-    const audioTimer = setTimeout(playFinalAudio, 2000);
-    return () => clearTimeout(audioTimer);
-  }, []);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-black text-green-400">
