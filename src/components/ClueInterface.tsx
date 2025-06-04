@@ -132,7 +132,7 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
                   <tbody>
                     <tr>
                       <td className="border border-green-400 p-2">Complete checkpoint quickly</td>
-                      <td className="border border-green-400 p-2">+10 (≤7 min), +7 (≤10 min), +4 (>10 min)</td>
+                      <td className="border border-green-400 p-2">+10 (≤7 min), +7 (≤10 min), +4 ({'>'}10 min)</td>
                     </tr>
                     <tr>
                       <td className="border border-green-400 p-2">Use a Lifeline</td>
