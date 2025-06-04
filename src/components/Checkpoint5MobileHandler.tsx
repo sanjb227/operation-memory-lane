@@ -24,31 +24,29 @@ const Checkpoint5MobileHandler: React.FC<Checkpoint5MobileHandlerProps> = ({
 
   const generateQRCodeUrl = (url: string) => {
     // Using QR Server API for QR code generation
-    return `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(url)}`;
+    return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}`;
   };
 
   if (showQR) {
     return (
       <div className="border border-green-400 p-6 bg-black/90 mb-6 text-center">
         <div className="text-green-300 font-bold mb-4">
-          📱 CHECKPOINT 5 - DESKTOP ACCESS
+          📱 CHECKPOINT 5 - DESKTOP REQUIRED
         </div>
         
         <div className="mb-4">
           <div className="text-sm text-green-400 mb-3">
-            1. Scan QR code with desktop/laptop camera or QR scanner
+            Scan with desktop/laptop to continue checkpoint 5:
           </div>
           <div className="flex justify-center mb-4">
             <img 
               src={generateQRCodeUrl(sessionUrl)} 
-              alt="QR Code for Desktop Access" 
-              className="border border-green-400 bg-white p-2"
-              style={{ maxWidth: '200px', height: 'auto' }}
+              alt="QR Code for Desktop" 
+              className="border border-green-400"
             />
           </div>
-          <div className="text-xs text-green-400 mb-4 space-y-1">
-            <div>2. Look for the code "SCI SPY" on desktop screen</div>
-            <div>3. Return here and enter that code to continue</div>
+          <div className="text-xs text-green-300 mb-4">
+            After completing on desktop, return here and click Continue
           </div>
         </div>
 
@@ -58,7 +56,7 @@ const Checkpoint5MobileHandler: React.FC<Checkpoint5MobileHandlerProps> = ({
             className="w-full bg-green-600 hover:bg-green-500 text-black font-bold py-3 px-4 transition-colors"
             style={{ minHeight: '48px', fontSize: '16px' }}
           >
-            ✅ I found the desktop code
+            ✅ Continue (I completed it on desktop)
           </button>
           
           <button
@@ -80,17 +78,17 @@ const Checkpoint5MobileHandler: React.FC<Checkpoint5MobileHandlerProps> = ({
       </div>
       
       <div className="text-sm text-green-400 mb-6 leading-relaxed">
-        This checkpoint requires viewing on a desktop/laptop to find the hidden code.
-        Choose an option below:
+        This checkpoint requires a desktop/laptop screen for optimal experience.
+        Choose an option below to continue:
       </div>
 
       <div className="space-y-4">
         <button
           onClick={handleShowQR}
-          className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-4 transition-colors"
+          className="w-full bg-blue-600 hover:bg-blue-500 text-black font-bold py-3 px-4 transition-colors"
           style={{ minHeight: '48px', fontSize: '16px' }}
         >
-          📱 Get QR Code for Desktop
+          📱 Show QR Code for Desktop
         </button>
         
         <button

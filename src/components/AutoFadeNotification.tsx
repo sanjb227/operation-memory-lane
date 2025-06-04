@@ -11,26 +11,22 @@ interface AutoFadeNotificationProps {
 const AutoFadeNotification: React.FC<AutoFadeNotificationProps> = ({ 
   message, 
   type, 
-  duration = 3000,
+  duration = 4000,
   onComplete 
 }) => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // Fade in immediately
-    const fadeInTimer = setTimeout(() => setIsVisible(true), 50);
+    // Fade in
+    setTimeout(() => setIsVisible(true), 100);
     
-    // Start fade out process
-    const fadeOutTimer = setTimeout(() => {
+    // Fade out and complete
+    const timer = setTimeout(() => {
       setIsVisible(false);
-      // Complete after fade out animation
       setTimeout(onComplete, 300);
     }, duration);
 
-    return () => {
-      clearTimeout(fadeInTimer);
-      clearTimeout(fadeOutTimer);
-    };
+    return () => clearTimeout(timer);
   }, [duration, onComplete]);
 
   const getTypeStyles = () => {
@@ -72,11 +68,12 @@ const AutoFadeNotification: React.FC<AutoFadeNotificationProps> = ({
 
   return (
     <div 
+      className="notification"
       style={{
         position: 'fixed',
         top: '120px',
         left: '50%',
-        transform: `translateX(-50%) translateY(${isVisible ? '0' : '-20px'})`,
+        transform: 'translateX(-50%)',
         zIndex: 1000,
         padding: '12px 24px',
         borderRadius: '6px',
@@ -86,7 +83,6 @@ const AutoFadeNotification: React.FC<AutoFadeNotificationProps> = ({
         backdropFilter: 'blur(4px)',
         transition: 'all 0.3s ease-in-out',
         opacity: isVisible ? 1 : 0,
-        pointerEvents: 'none',
         ...typeStyles
       }}
     >

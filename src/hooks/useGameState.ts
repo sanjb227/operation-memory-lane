@@ -94,7 +94,7 @@ export const useGameState = () => {
         isGameComplete: sharedSession.isGameComplete,
         notifications: []
       });
-      // Don't add notification here - it was causing persistent notifications
+      addNotification("Game resumed from shared session", "info");
       return;
     }
 
@@ -119,7 +119,7 @@ export const useGameState = () => {
         isGameComplete: savedState.isGameComplete,
         notifications: []
       });
-      // Don't add persistent notification for resumed games
+      addNotification("Game resumed from where you left off", "info");
     }
     setShowRecoveryModal(false);
   }, []);

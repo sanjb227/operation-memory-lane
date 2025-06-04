@@ -1,10 +1,8 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { getClueText, getLifelineText } from '../utils/clueData';
 import AutoFadeNotification from './AutoFadeNotification';
 import Checkpoint5MobileHandler from './Checkpoint5MobileHandler';
-import DesktopCodeDisplay from './DesktopCodeDisplay';
-import { detectDevice, isRealDesktop } from '../utils/deviceDetection';
+import { detectDevice } from '../utils/deviceDetection';
 
 interface ClueInterfaceProps {
   currentCheckpoint: number;
@@ -44,7 +42,7 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
 
   const device = detectDevice();
-  const isCheckpoint5Mobile = currentCheckpoint === 4 && !isRealDesktop(); // Checkpoint 5 is index 4
+  const isCheckpoint5Mobile = currentCheckpoint === 4 && (device.isMobile || device.isTablet); // Checkpoint 5 is index 4
 
   // Fix input focus and initialization
   useEffect(() => {
@@ -112,9 +110,6 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 pt-20">
-      {/* Desktop Code Display for Checkpoint 5 */}
-      <DesktopCodeDisplay checkpoint={currentCheckpoint} code="SCI SPY" />
-      
       <div className="max-w-md w-full space-y-4">
         {/* Help Button */}
         <div className="absolute top-20 left-4">
@@ -342,7 +337,6 @@ const ClueInterface: React.FC<ClueInterfaceProps> = ({
               key={notification.id}
               message={notification.message}
               type={notification.type}
-              duration={3000}
               onComplete={() => onRemoveNotification(notification.id)}
             />
           ))}
